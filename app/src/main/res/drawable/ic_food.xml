@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal">
+    <!-- Generic food / set meal icon -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M8.1,13.34L3.91,9.16C2.35,7.59 2.35,5.06 3.91,3.5L10.93,10.52L8.1,13.34ZM14.88,11.53C16.54,12.36 18.81,11.79 20.55,10.05C22.66,7.94 23.12,4.98 21.58,3.44C20.04,1.9 17.08,2.36 14.97,4.47C13.23,6.21 12.66,8.48 13.49,10.14L3,20.63L4.39,22.02L12.01,14.4L19.63,22.02L21.02,20.63L13.4,13.01L14.88,11.53Z" />
+</vector>

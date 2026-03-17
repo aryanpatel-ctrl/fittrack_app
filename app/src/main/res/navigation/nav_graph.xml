@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_dashboard">
+
+    <!-- Dashboard -->
+    <fragment
+        android:id="@+id/navigation_dashboard"
+        android:name="com.fittrackpro.ui.dashboard.DashboardFragment"
+        android:label="@string/nav_dashboard"
+        tools:layout="@layout/fragment_dashboard">
+
+        <action
+            android:id="@+id/action_dashboard_to_activity_detail"
+            app:destination="@id/activityDetailFragment" />
+    </fragment>
+
+    <!-- Activities -->
+    <fragment
+        android:id="@+id/navigation_activities"
+        android:name="com.fittrackpro.ui.tracking.ActivitiesFragment"
+        android:label="@string/nav_activities"
+        tools:layout="@layout/fragment_activities">
+
+        <action
+            android:id="@+id/action_activities_to_activity_detail"
+            app:destination="@id/activityDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/activityDetailFragment"
+        android:name="com.fittrackpro.ui.tracking.ActivityDetailFragment"
+        android:label="Activity Detail"
+        tools:layout="@layout/fragment_activity_detail">
+
+        <argument
+            android:name="trackId"
+            app:argType="string" />
+    </fragment>
+
+    <!-- Training -->
+    <fragment
+        android:id="@+id/navigation_training"
+        android:name="com.fittrackpro.ui.training.TrainingFragment"
+        android:label="@string/nav_training"
+        tools:layout="@layout/fragment_training">
+
+        <action
+            android:id="@+id/action_training_to_goal_wizard"
+            app:destination="@id/goalWizardFragment" />
+
+        <action
+            android:id="@+id/action_training_to_workout_detail"
+            app:destination="@id/workoutDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/goalWizardFragment"
+        android:name="com.fittrackpro.ui.training.GoalWizardFragment"
+        android:label="Set Goal"
+        tools:layout="@layout/fragment_goal_wizard" />
+
+    <fragment
+        android:id="@+id/workoutDetailFragment"
+        android:name="com.fittrackpro.ui.training.WorkoutDetailFragment"
+        android:label="Workout Detail"
+        tools:layout="@layout/fragment_workout_detail">
+
+        <argument
+            android:name="workoutId"
+            app:argType="string" />
+    </fragment>
+
+    <!-- Social / Challenges -->
+    <fragment
+        android:id="@+id/navigation_social"
+        android:name="com.fittrackpro.ui.social.SocialFragment"
+        android:label="@string/nav_social"
+        tools:layout="@layout/fragment_social">
+
+        <action
+            android:id="@+id/action_social_to_challenge_detail"
+            app:destination="@id/challengeDetailFragment" />
+
+        <action
+            android:id="@+id/action_social_to_create_challenge"
+            app:destination="@id/createChallengeFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/challengeDetailFragment"
+        android:name="com.fittrackpro.ui.social.ChallengeDetailFragment"
+        android:label="Challenge Detail"
+        tools:layout="@layout/fragment_challenge_detail">
+
+        <argument
+            android:name="challengeId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createChallengeFragment"
+        android:name="com.fittrackpro.ui.social.CreateChallengeFragment"
+        android:label="@string/create_challenge"
+        tools:layout="@layout/fragment_create_challenge" />
+
+    <!-- Profile -->
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.fittrackpro.ui.profile.ProfileFragment"
+        android:label="@string/nav_profile"
+        tools:layout="@layout/fragment_profile">
+
+        <action
+            android:id="@+id/action_profile_to_settings"
+            app:destination="@id/settingsFragment" />
+
+        <action
+            android:id="@+id/action_profile_to_achievements"
+            app:destination="@id/achievementsFragment" />
+
+        <action
+            android:id="@+id/action_profile_to_nutrition"
+            app:destination="@id/nutritionFragment" />
+
+        <action
+            android:id="@+id/action_profile_to_analytics"
+            app:destination="@id/analyticsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.fittrackpro.ui.profile.SettingsFragment"
+        android:label="@string/settings"
+        tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/achievementsFragment"
+        android:name="com.fittrackpro.ui.achievements.AchievementsFragment"
+        android:label="@string/achievements"
+        tools:layout="@layout/fragment_achievements" />
+
+    <fragment
+        android:id="@+id/nutritionFragment"
+        android:name="com.fittrackpro.ui.nutrition.NutritionFragment"
+        android:label="@string/nutrition"
+        tools:layout="@layout/fragment_nutrition">
+
+        <action
+            android:id="@+id/action_nutrition_to_add_meal"
+            app:destination="@id/addMealFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addMealFragment"
+        android:name="com.fittrackpro.ui.nutrition.AddMealFragment"
+        android:label="@string/log_meal"
+        tools:layout="@layout/fragment_add_meal">
+
+        <argument
+            android:name="mealType"
+            app:argType="string"
+            android:defaultValue="breakfast" />
+    </fragment>
+
+    <!-- Analytics -->
+    <fragment
+        android:id="@+id/analyticsFragment"
+        android:name="com.fittrackpro.ui.analytics.AnalyticsFragment"
+        android:label="Analytics"
+        tools:layout="@layout/fragment_analytics" />
+
+</navigation>

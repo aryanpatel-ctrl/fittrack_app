@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ==================== PRIMARY BRAND COLORS ==================== -->
+    <!-- Fitness Green Theme -->
+    <color name="primary">#FF4CAF50</color>
+    <color name="primary_dark">#FF388E3C</color>
+    <color name="primary_light">#FFC8E6C9</color>
+    <color name="primary_variant">#FF2E7D32</color>
+    <color name="primary_surface">#1A4CAF50</color>
+
+    <!-- ==================== SECONDARY COLORS ==================== -->
+    <!-- Energy Orange -->
+    <color name="secondary">#FFFF9800</color>
+    <color name="secondary_dark">#FFF57C00</color>
+    <color name="secondary_light">#FFFFE0B2</color>
+    <color name="secondary_variant">#FFEF6C00</color>
+
+    <!-- ==================== ACCENT COLORS ==================== -->
+    <color name="accent">#FF03A9F4</color>
+    <color name="accent_dark">#FF0288D1</color>
+    <color name="accent_light">#FFB3E5FC</color>
+    <color name="accent_surface">#1A03A9F4</color>
+
+    <!-- ==================== BACKGROUND COLORS ==================== -->
+    <color name="background">#FFF5F7FA</color>
+    <color name="background_dark">#FF121212</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="surface_dark">#FF1E1E1E</color>
+    <color name="surface_elevated">#FFFFFFFF</color>
+    <color name="card_background">#FFFFFFFF</color>
+
+    <!-- ==================== TEXT COLORS ==================== -->
+    <color name="text_primary">#DE000000</color>
+    <color name="text_secondary">#8A000000</color>
+    <color name="text_hint">#61000000</color>
+    <color name="text_disabled">#42000000</color>
+    <color name="text_on_primary">#FFFFFFFF</color>
+    <color name="text_on_secondary">#FF000000</color>
+    <color name="text_on_surface">#DE000000</color>
+
+    <!-- Dark Mode Text -->
+    <color name="text_primary_dark">#DEFFFFFF</color>
+    <color name="text_secondary_dark">#99FFFFFF</color>
+    <color name="text_hint_dark">#61FFFFFF</color>
+
+    <!-- ==================== STATUS COLORS ==================== -->
+    <color name="success">#FF4CAF50</color>
+    <color name="success_light">#FFE8F5E9</color>
+    <color name="warning">#FFFFC107</color>
+    <color name="warning_light">#FFFFF8E1</color>
+    <color name="error">#FFF44336</color>
+    <color name="error_light">#FFFFEBEE</color>
+    <color name="info">#FF2196F3</color>
+    <color name="info_light">#FFE3F2FD</color>
+
+    <!-- ==================== ACTIVITY TYPE COLORS ==================== -->
+    <color name="running">#FF4CAF50</color>
+    <color name="cycling">#FFFF9800</color>
+    <color name="walking">#FF03A9F4</color>
+    <color name="hiking">#FF795548</color>
+    <color name="swimming">#FF00BCD4</color>
+
+    <color name="activity_running">#FF4CAF50</color>
+    <color name="activity_cycling">#FFFF9800</color>
+    <color name="activity_walking">#FF03A9F4</color>
+    <color name="activity_hiking">#FF795548</color>
+    <color name="activity_swimming">#FF00BCD4</color>
+
+    <color name="activity_running_bg">#1A4CAF50</color>
+    <color name="activity_cycling_bg">#1AFF9800</color>
+    <color name="activity_walking_bg">#1A03A9F4</color>
+    <color name="activity_hiking_bg">#1A795548</color>
+    <color name="activity_swimming_bg">#1A00BCD4</color>
+
+    <!-- ==================== STATS COLORS ==================== -->
+    <color name="stat_distance">#FF4CAF50</color>
+    <color name="stat_duration">#FF03A9F4</color>
+    <color name="stat_calories">#FFF44336</color>
+    <color name="stat_pace">#FF9C27B0</color>
+    <color name="stat_elevation">#FF795548</color>
+    <color name="stat_steps">#FFFF9800</color>
+
+    <color name="stat_distance_bg">#1A4CAF50</color>
+    <color name="stat_duration_bg">#1A03A9F4</color>
+    <color name="stat_calories_bg">#1AF44336</color>
+
+    <!-- ==================== GAMIFICATION COLORS ==================== -->
+    <!-- Streak & Fire -->
+    <color name="streak_fire">#FFFF6B35</color>
+    <color name="streak_fire_light">#FFFFAB91</color>
+    <color name="streak_bg">#33FF6B35</color>
+
+    <!-- XP & Levels -->
+    <color name="xp_gold">#FFFFD700</color>
+    <color name="xp_gold_light">#FFFFF176</color>
+    <color name="xp_purple">#FF9C27B0</color>
+    <color name="level_bg">#33FFD700</color>
+
+    <!-- Achievement Tiers -->
+    <color name="tier_bronze">#FFCD7F32</color>
+    <color name="tier_bronze_bg">#1ACD7F32</color>
+    <color name="tier_silver">#FFC0C0C0</color>
+    <color name="tier_silver_bg">#1AC0C0C0</color>
+    <color name="tier_gold">#FFFFD700</color>
+    <color name="tier_gold_bg">#1AFFD700</color>
+    <color name="tier_platinum">#FFE5E4E2</color>
+    <color name="tier_platinum_bg">#1AE5E4E2</color>
+
+    <!-- Medal Colors (Leaderboard) -->
+    <color name="gold">#FFFFD700</color>
+    <color name="silver">#FFC0C0C0</color>
+    <color name="bronze">#FFCD7F32</color>
+
+    <!-- ==================== CHART COLORS ==================== -->
+    <color name="chart_primary">#FF4CAF50</color>
+    <color name="chart_secondary">#FFFF9800</color>
+    <color name="chart_tertiary">#FF03A9F4</color>
+    <color name="chart_quaternary">#FF9C27B0</color>
+    <color name="chart_grid">#1F000000</color>
+    <color name="chart_text">#8A000000</color>
+    <color name="chart_highlight">#FF4CAF50</color>
+
+    <!-- ==================== HEART RATE ZONES ==================== -->
+    <color name="hr_zone_1">#FF4CAF50</color>
+    <color name="hr_zone_2">#FF8BC34A</color>
+    <color name="hr_zone_3">#FFFFEB3B</color>
+    <color name="hr_zone_4">#FFFF9800</color>
+    <color name="hr_zone_5">#FFF44336</color>
+
+    <!-- ==================== WEATHER COLORS ==================== -->
+    <color name="weather_card_bg">#FFF0F7FF</color>
+    <color name="weather_sunny">#FFFFC107</color>
+    <color name="weather_cloudy">#FF90A4AE</color>
+    <color name="weather_rainy">#FF42A5F5</color>
+    <color name="weather_stormy">#FF5C6BC0</color>
+    <color name="weather_snowy">#FFB3E5FC</color>
+    <color name="weather_good">#FF4CAF50</color>
+    <color name="weather_moderate">#FFFFC107</color>
+    <color name="weather_poor">#FFF44336</color>
+
+    <!-- ==================== MOTIVATION CARD COLORS ==================== -->
+    <color name="card_motivation_bg">#FFFFF8E1</color>
+    <color name="motivation_border">#FFFFECB3</color>
+    <color name="motivation_icon">#FFFF8F00</color>
+    <color name="motivation_text">#FF5D4037</color>
+
+    <!-- ==================== TIP CARD COLORS ==================== -->
+    <color name="tip_card_bg">#FFE3F2FD</color>
+    <color name="tip_border">#FF90CAF9</color>
+    <color name="tip_icon">#FF1976D2</color>
+    <color name="tip_text">#FF0D47A1</color>
+
+    <!-- ==================== EMPTY STATE COLORS ==================== -->
+    <color name="empty_state_bg">#FFF5F5F5</color>
+    <color name="empty_state_icon">#FFBDBDBD</color>
+    <color name="empty_state_title">#FF424242</color>
+    <color name="empty_state_message">#FF757575</color>
+
+    <!-- ==================== NUTRITION COLORS ==================== -->
+    <color name="nutrition_protein">#FF4CAF50</color>
+    <color name="nutrition_carbs">#FFFF9800</color>
+    <color name="nutrition_fat">#FFF44336</color>
+    <color name="nutrition_fiber">#FF795548</color>
+    <color name="nutrition_water">#FF03A9F4</color>
+
+    <color name="meal_breakfast">#FFFFC107</color>
+    <color name="meal_lunch">#FF4CAF50</color>
+    <color name="meal_dinner">#FF9C27B0</color>
+    <color name="meal_snack">#FF03A9F4</color>
+
+    <!-- ==================== CHALLENGE COLORS ==================== -->
+    <color name="challenge_active">#FF4CAF50</color>
+    <color name="challenge_pending">#FFFFC107</color>
+    <color name="challenge_completed">#FF9E9E9E</color>
+    <color name="challenge_winner">#FFFFD700</color>
+
+    <!-- ==================== COACH STATUS COLORS ==================== -->
+    <color name="client_active">#FF4CAF50</color>
+    <color name="client_at_risk">#FFFFC107</color>
+    <color name="client_inactive">#FFF44336</color>
+
+    <!-- ==================== PROGRESS COLORS ==================== -->
+    <color name="progress_background">#FFE0E0E0</color>
+    <color name="progress_primary">#FF4CAF50</color>
+    <color name="progress_secondary">#FF03A9F4</color>
+
+    <!-- ==================== DIVIDER & BORDERS ==================== -->
+    <color name="divider">#1F000000</color>
+    <color name="divider_light">#0F000000</color>
+    <color name="border">#FFE0E0E0</color>
+    <color name="border_focused">#FF4CAF50</color>
+
+    <!-- ==================== ONBOARDING COLORS ==================== -->
+    <color name="onboarding_bg_1">#FF4CAF50</color>
+    <color name="onboarding_bg_2">#FF03A9F4</color>
+    <color name="onboarding_bg_3">#FFFF9800</color>
+    <color name="onboarding_bg_4">#FF9C27B0</color>
+    <color name="onboarding_indicator_active">#FFFFFFFF</color>
+    <color name="onboarding_indicator_inactive">#80FFFFFF</color>
+
+    <!-- ==================== SHADOW & OVERLAY ==================== -->
+    <color name="shadow">#1F000000</color>
+    <color name="overlay_dark">#80000000</color>
+    <color name="overlay_light">#40FFFFFF</color>
+    <color name="ripple_light">#1FFFFFFF</color>
+    <color name="ripple_dark">#1F000000</color>
+
+    <!-- ==================== SHIMMER / SKELETON ==================== -->
+    <color name="shimmer_base">#FFE0E0E0</color>
+    <color name="shimmer_highlight">#FFF5F5F5</color>
+
+    <!-- ==================== ADDITIONAL UI COLORS ==================== -->
+    <!-- Streak Card -->
+    <color name="streak_card_background">#FFFFF8F0</color>
+
+    <!-- XP Badge -->
+    <color name="xp_text">#FFB8860B</color>
+    <color name="xp_badge_bg">#FFFFF8E1</color>
+
+    <!-- Tip Card Enhanced -->
+    <color name="tip_card_background">#FFFFF8E1</color>
+    <color name="tip_card_icon">#FFFFC107</color>
+    <color name="tip_card_text">#FF5D4037</color>
+
+    <!-- ==================== LEGACY COLORS ==================== -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

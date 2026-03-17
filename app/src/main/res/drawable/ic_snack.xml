@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal">
+    <!-- Apple / snack icon -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M20,10C20,10 19.32,7.14 17.22,5.95C16.07,5.29 14.78,5.46 13.83,5.87C13.07,6.2 12.2,6.2 11.44,5.87C10.49,5.46 9.21,5.29 8.05,5.95C5.95,7.14 5.27,10 5.27,10C4.64,12.17 4.38,14.74 5.46,17.06C6.6,19.47 8.67,20.95 10.94,20.99C11.21,21 11.5,20.95 11.74,20.83C11.9,20.75 12.1,20.75 12.26,20.83C12.5,20.95 12.79,21 13.06,20.99C15.33,20.95 17.4,19.47 18.54,17.06C19.62,14.74 19.36,12.17 18.73,10H20ZM12,4C12,2.9 12.9,2 14,2C14,3.1 13.1,4 12,4Z" />
+</vector>

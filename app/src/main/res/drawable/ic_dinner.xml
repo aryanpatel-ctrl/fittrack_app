@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal">
+    <!-- Dinner plate icon -->
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M1,21.98C1,22.54 1.45,23 1.98,23H22.02C22.54,23 23,22.54 23,21.98V21.35C23,20.54 22.26,20 21.51,20H2.49C1.74,20 1,20.54 1,21.35V21.98ZM8.71,17.29L8.71,17.29C8.96,17.04 9.31,16.91 9.67,16.97C10.59,17.12 11.49,17.2 12.41,17.2C16.09,17.18 19.41,15.45 21.56,12.62L22.61,11.29C22.85,10.98 22.81,10.53 22.53,10.25C22.24,9.97 21.79,9.93 21.47,10.18L18.89,12.12L12.23,4.62C11.85,4.19 11.2,4.15 10.77,4.52L10.77,4.52C10.34,4.9 10.3,5.55 10.67,5.98L14.52,10.42L3.25,18.36C2.89,18.63 2.82,19.14 3.09,19.5L3.09,19.5C3.37,19.86 3.88,19.93 4.24,19.66L9.49,15.81L9.49,15.81C9.29,16.36 9.12,16.88 8.71,17.29Z" />
+</vector>
