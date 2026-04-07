@@ -44,13 +44,19 @@ class MainActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.navigation_dashboard,
                 R.id.navigation_activities,
-                R.id.navigation_training,
+                R.id.navigation_training -> {
+                    showBottomNav()
+                    binding.fabStartTracking.visibility = android.view.View.VISIBLE
+                }
                 R.id.navigation_social,
                 R.id.navigation_profile -> {
                     showBottomNav()
+                    // Hide workout FAB on Social and Profile screens
+                    binding.fabStartTracking.visibility = android.view.View.GONE
                 }
                 else -> {
-                    // Keep bottom nav visible for nested destinations
+                    // Hide FAB on all detail/nested screens
+                    binding.fabStartTracking.visibility = android.view.View.GONE
                 }
             }
         }
