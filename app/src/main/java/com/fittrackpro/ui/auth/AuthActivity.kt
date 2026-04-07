@@ -4,23 +4,52 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.fittrackpro.R
 import com.fittrackpro.databinding.ActivityAuthBinding
+import com.fittrackpro.data.local.database.dao.UserDao
+import com.fittrackpro.data.local.database.entity.User
 import com.fittrackpro.ui.main.MainActivity
 import com.fittrackpro.data.local.preferences.UserPreferences
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class AuthActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAuthBinding
+    private lateinit var googleSignInClient: GoogleSignInClient
     private var isLoginMode = true
 
     @Inject
     lateinit var userPreferences: UserPreferences
+
+    @Inject
+    lateinit var userDao: UserDao
+
+    private val googleSignInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            account.idToken?.let { firebaseAuthWithGoogle(it) }
+        } catch (e: ApiException) {
+            binding.progressBar.visibility = View.GONE
+            binding.tvError.visibility = View.VISIBLE
+            binding.tvError.text = "Google Sign-In failed: ${e.localizedMessage}"
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +61,16 @@ class AuthActivity : AppCompatActivity() {
 
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setupGoogleSignIn()
         setupUI()
+    }
+
+    private fun setupGoogleSignIn() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
+        googleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
     private fun setupUI() {
@@ -56,6 +94,43 @@ class AuthActivity : AppCompatActivity() {
             if (email.isNotEmpty()) resetPassword(email)
             else binding.tilEmail.error = "Enter your email first"
         }
+
+        binding.btnGoogleSignIn.setOnClickListener {
+            signInWithGoogle()
+        }
+    }
+
+    private fun signInWithGoogle() {
+        binding.progressBar.visibility = View.VISIBLE
+        binding.tvError.visibility = View.GONE
+        val signInIntent = googleSignInClient.signInIntent
+        googleSignInLauncher.launch(signInIntent)
+    }
+
+    private fun firebaseAuthWithGoogle(idToken: String) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        FirebaseAuth.getInstance().signInWithCredential(credential)
+            .addOnSuccessListener { result ->
+                binding.progressBar.visibility = View.GONE
+                result.user?.let { user ->
+                    userPreferences.isLoggedIn = true
+                    userPreferences.userId = user.uid
+                    userPreferences.userEmail = user.email ?: ""
+                    userPreferences.userName = user.displayName ?: "User"
+
+                    // Create user in database if not exists
+                    createUserInDatabase(
+                        userId = user.uid,
+                        email = user.email ?: "",
+                        name = user.displayName ?: "User"
+                    )
+                }
+            }
+            .addOnFailureListener { e ->
+                binding.progressBar.visibility = View.GONE
+                binding.tvError.visibility = View.VISIBLE
+                binding.tvError.text = e.localizedMessage ?: "Google Sign-In failed"
+            }
     }
 
     private fun toggleMode() {
@@ -96,11 +171,18 @@ class AuthActivity : AppCompatActivity() {
             .addOnSuccessListener { result ->
                 binding.progressBar.visibility = View.GONE
                 result.user?.let { user ->
+                    val userName = user.displayName ?: email.substringBefore("@")
                     userPreferences.isLoggedIn = true
                     userPreferences.userId = user.uid
                     userPreferences.userEmail = email
-                    userPreferences.userName = user.displayName ?: email.substringBefore("@")
-                    navigateToMain()
+                    userPreferences.userName = userName
+
+                    // Create user in database if not exists
+                    createUserInDatabase(
+                        userId = user.uid,
+                        email = email,
+                        name = userName
+                    )
                 }
             }
             .addOnFailureListener { e ->
@@ -121,7 +203,13 @@ class AuthActivity : AppCompatActivity() {
                     userPreferences.userId = user.uid
                     userPreferences.userEmail = email
                     userPreferences.userName = name
-                    navigateToMain()
+
+                    // Create user in database
+                    createUserInDatabase(
+                        userId = user.uid,
+                        email = email,
+                        name = name
+                    )
                 }
             }
             .addOnFailureListener { e ->
@@ -138,6 +226,29 @@ class AuthActivity : AppCompatActivity() {
                 binding.tvError.visibility = View.VISIBLE
                 binding.tvError.text = e.localizedMessage ?: "Failed to send reset email"
             }
+    }
+
+    private fun createUserInDatabase(userId: String, email: String, name: String) {
+        lifecycleScope.launch {
+            try {
+                // Check if user already exists
+                val existingUser = userDao.getUserById(userId)
+                if (existingUser == null) {
+                    val newUser = User(
+                        id = userId,
+                        email = email,
+                        name = name
+                    )
+                    userDao.insertUser(newUser)
+                }
+                // Navigate to main after user is created
+                navigateToMain()
+            } catch (e: Exception) {
+                // If insertion fails, still navigate but log error
+                e.printStackTrace()
+                navigateToMain()
+            }
+        }
     }
 
     private fun navigateToMain() {

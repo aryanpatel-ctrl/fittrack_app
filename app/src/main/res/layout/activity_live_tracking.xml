@@ -177,17 +177,6 @@
                     android:textColor="@color/text_secondary"
                     tools:text="0 kcal" />
 
-                <TextView
-                    android:id="@+id/tv_elevation"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:drawableStart="@drawable/ic_elevation"
-                    android:drawablePadding="8dp"
-                    android:gravity="center_vertical"
-                    android:textColor="@color/text_secondary"
-                    tools:text="0 m" />
-
             </LinearLayout>
 
             <!-- Control Buttons -->
@@ -223,20 +212,6 @@
                     app:fabCustomSize="72dp"
                     app:maxImageSize="32dp"
                     app:tint="@color/white" />
-
-                <!-- Lock Button -->
-                <com.google.android.material.floatingactionbutton.FloatingActionButton
-                    android:id="@+id/btn_lock"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:contentDescription="Lock screen"
-                    android:src="@drawable/ic_lock"
-                    android:visibility="gone"
-                    app:backgroundTint="@color/surface"
-                    app:fabSize="normal"
-                    app:tint="@color/text_primary"
-                    tools:visibility="visible" />
 
             </LinearLayout>
 
