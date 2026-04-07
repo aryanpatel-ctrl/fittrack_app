@@ -72,10 +72,22 @@ object NetworkModule {
     @Provides
     @Singleton
     @Named("openfoodfacts")
-    fun provideOpenFoodFactsRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideOpenFoodFactsRetrofit(): Retrofit {
+        // Open Food Facts requires User-Agent header
+        val client = OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val request = chain.request().newBuilder()
+                    .header("User-Agent", "FitTrackPro/1.0 (Android; contact@fittrackpro.com)")
+                    .build()
+                chain.proceed(request)
+            }
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .build()
+
         return Retrofit.Builder()
             .baseUrl("https://world.openfoodfacts.org/")
-            .client(okHttpClient)
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

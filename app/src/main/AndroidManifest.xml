@@ -14,6 +14,7 @@
     <!-- Foreground Service Permission (GPS Tracking Service) -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
 
     <!-- Activity Recognition (Step counting, activity detection) -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
@@ -39,6 +40,11 @@
     <uses-feature
         android:name="android.hardware.location.gps"
         android:required="true" />
+
+    <!-- Step counter sensor (optional) -->
+    <uses-feature
+        android:name="android.hardware.sensor.stepcounter"
+        android:required="false" />
 
     <application
         android:name=".FitTrackApplication"
@@ -86,16 +92,23 @@
             android:exported="false"
             android:foregroundServiceType="location" />
 
+        <!-- Step Counter Foreground Service -->
+        <service
+            android:name=".service.StepCounterService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="health" />
+
         <!-- Sync Worker for WorkManager -->
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
             tools:node="merge" />
 
-        <!-- Google Maps API Key (placeholder - replace with actual key) -->
+        <!-- Google Maps API Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_GOOGLE_MAPS_API_KEY" />
+            android:value="AIzaSyBmWqEuYiBYcPsewNmMIBVlwhrWfdbjLVc" />
 
         <!-- Firebase Cloud Messaging -->
         <service
@@ -105,6 +118,17 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <!-- File Provider for export sharing -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
     </application>
 

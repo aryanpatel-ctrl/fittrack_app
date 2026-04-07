@@ -96,6 +96,9 @@ dependencies {
     implementation(libs.play.services.location)
     implementation(libs.play.services.maps)
 
+    // Google Sign-In
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+
     // MPAndroidChart (Required - Performance Analytics)
     implementation(libs.mpandroidchart)
 
