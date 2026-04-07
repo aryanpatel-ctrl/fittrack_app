@@ -46,8 +46,17 @@ class FitTrackApplication : Application() {
                 description = "Notifications for challenges and leaderboards"
             }
 
+            // Water Reminders Channel
+            val waterChannel = NotificationChannel(
+                CHANNEL_WATER_REMINDER,
+                "Water Reminders",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Reminders to stay hydrated throughout the day"
+            }
+
             notificationManager.createNotificationChannels(
-                listOf(trackingChannel, achievementsChannel, challengesChannel)
+                listOf(trackingChannel, achievementsChannel, challengesChannel, waterChannel)
             )
         }
     }
@@ -56,5 +65,6 @@ class FitTrackApplication : Application() {
         const val CHANNEL_TRACKING = "tracking_channel"
         const val CHANNEL_ACHIEVEMENTS = "achievements_channel"
         const val CHANNEL_CHALLENGES = "challenges_channel"
+        const val CHANNEL_WATER_REMINDER = "water_reminder_channel"
     }
 }

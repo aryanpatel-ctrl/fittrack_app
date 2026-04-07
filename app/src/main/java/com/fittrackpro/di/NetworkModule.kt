@@ -1,6 +1,7 @@
 package com.fittrackpro.di
 
 import com.fittrackpro.data.remote.api.NutritionixApi
+import com.fittrackpro.data.remote.api.OpenFoodFactsApi
 import com.fittrackpro.data.remote.api.WeatherApi
 import com.fittrackpro.util.Constants
 import dagger.Module
@@ -66,5 +67,22 @@ object NetworkModule {
     @Singleton
     fun provideWeatherApi(@Named("weather") retrofit: Retrofit): WeatherApi {
         return retrofit.create(WeatherApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    @Named("openfoodfacts")
+    fun provideOpenFoodFactsRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl("https://world.openfoodfacts.org/")
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideOpenFoodFactsApi(@Named("openfoodfacts") retrofit: Retrofit): OpenFoodFactsApi {
+        return retrofit.create(OpenFoodFactsApi::class.java)
     }
 }

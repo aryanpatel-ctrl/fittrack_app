@@ -76,4 +76,8 @@ object DatabaseModule {
     // Coach DAOs
     @Provides
     fun provideCoachDao(database: FitTrackDatabase): CoachDao = database.coachDao()
+
+    // Step DAOs
+    @Provides
+    fun provideStepDao(database: FitTrackDatabase): StepDao = database.stepDao()
 }
