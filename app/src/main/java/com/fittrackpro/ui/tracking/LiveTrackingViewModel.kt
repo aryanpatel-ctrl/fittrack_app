@@ -6,10 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fittrackpro.data.local.database.dao.TrackDao
 import com.fittrackpro.data.local.database.dao.TrackPointDao
+import com.fittrackpro.data.local.database.dao.UserDao
 import com.fittrackpro.data.local.database.entity.Track
 import com.fittrackpro.data.local.database.entity.TrackPoint
 import com.fittrackpro.data.local.database.entity.TrackStatistics
+import com.fittrackpro.data.local.database.entity.User
+import com.fittrackpro.data.local.database.entity.UserStats
 import com.fittrackpro.data.local.preferences.UserPreferences
+import com.fittrackpro.service.AchievementService
 import com.fittrackpro.util.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -22,7 +26,9 @@ import javax.inject.Inject
 class LiveTrackingViewModel @Inject constructor(
     private val trackDao: TrackDao,
     private val trackPointDao: TrackPointDao,
-    private val userPreferences: UserPreferences
+    private val userDao: UserDao,
+    private val userPreferences: UserPreferences,
+    private val achievementService: AchievementService
 ) : ViewModel() {
 
     private val _trackingState = MutableLiveData(TrackingState.IDLE)
@@ -46,6 +52,11 @@ class LiveTrackingViewModel @Inject constructor(
     private val _currentSpeed = MutableLiveData(0f)
     val currentSpeed: LiveData<Float> = _currentSpeed
 
+    private val _steps = MutableLiveData(0)
+    val steps: LiveData<Int> = _steps
+
+    private var startStepCount: Int = 0
+
     private var currentTrackId: String? = null
     private var startTime: Long = 0
     private var pausedDuration: Long = 0
@@ -61,6 +72,48 @@ class LiveTrackingViewModel @Inject constructor(
     fun startTracking() {
         viewModelScope.launch {
             val userId = userPreferences.userId ?: return@launch
+
+            // Ensure user exists in database before creating track
+            val existingUser = userDao.getUserById(userId)
+            if (existingUser == null) {
+                // Create user record if it doesn't exist
+                val newUser = User(
+                    id = userId,
+                    email = userPreferences.userEmail ?: "user@fittrackpro.app",
+                    name = userPreferences.userName ?: "FitTrack User",
+                    role = userPreferences.userRole
+                )
+                userDao.insertUser(newUser)
+
+                // Also create UserStats record
+                val newStats = UserStats(
+                    userId = userId,
+                    totalActivities = 0,
+                    totalDistance = 0.0,
+                    totalDuration = 0L,
+                    totalCalories = 0,
+                    totalElevationGain = 0.0,
+                    totalXp = 0,
+                    level = 1
+                )
+                userDao.insertStats(newStats)
+            } else {
+                // Ensure stats exist for existing user
+                val existingStats = userDao.getStatsByUserId(userId)
+                if (existingStats == null) {
+                    val newStats = UserStats(
+                        userId = userId,
+                        totalActivities = 0,
+                        totalDistance = 0.0,
+                        totalDuration = 0L,
+                        totalCalories = 0,
+                        totalElevationGain = 0.0,
+                        totalXp = 0,
+                        level = 1
+                    )
+                    userDao.insertStats(newStats)
+                }
+            }
 
             // Create new track
             val trackId = UUID.randomUUID().toString()
@@ -99,27 +152,60 @@ class LiveTrackingViewModel @Inject constructor(
 
             currentTrackId?.let { trackId ->
                 val endTime = System.currentTimeMillis()
+                val userId = userPreferences.userId
 
                 // Update track
                 trackDao.updateTrackStatus(trackId, "completed", endTime)
 
+                val finalDistance = _distance.value ?: 0.0
+                val finalDuration = _duration.value ?: 0L
+                val finalCalories = _calories.value ?: 0
+                val finalElevation = _elevation.value ?: 0.0
+
                 // Save statistics
                 val statistics = TrackStatistics(
                     trackId = trackId,
-                    distance = _distance.value ?: 0.0,
-                    duration = _duration.value ?: 0L,
+                    distance = finalDistance,
+                    duration = finalDuration,
                     totalTime = endTime - startTime,
                     avgSpeed = calculateAverageSpeed(),
                     maxSpeed = 0f, // Would be calculated from track points
-                    calories = _calories.value ?: 0,
-                    elevationGain = _elevation.value ?: 0.0
+                    calories = finalCalories,
+                    elevationGain = finalElevation,
+                    steps = _steps.value ?: 0
                 )
                 trackDao.insertStatistics(statistics)
 
                 // Update user stats
-                val userId = userPreferences.userId
                 if (userId != null) {
-                    // This would update total user stats
+                    // Ensure UserStats exists for the user
+                    val existingStats = userDao.getStatsByUserId(userId)
+                    if (existingStats == null) {
+                        val newStats = UserStats(
+                            userId = userId,
+                            totalActivities = 0,
+                            totalDistance = 0.0,
+                            totalDuration = 0L,
+                            totalCalories = 0,
+                            totalElevationGain = 0.0,
+                            totalXp = 0,
+                            level = 1
+                        )
+                        userDao.insertStats(newStats)
+                    }
+
+                    // Update stats with this activity's data
+                    userDao.updateStatsAfterActivity(
+                        userId = userId,
+                        distance = finalDistance,
+                        duration = finalDuration,
+                        calories = finalCalories,
+                        elevation = finalElevation,
+                        timestamp = endTime
+                    )
+
+                    // Check for achievement unlocks after workout completion
+                    achievementService.checkAchievementsAfterWorkout(userId, trackId)
                 }
             }
 
@@ -160,6 +246,15 @@ class LiveTrackingViewModel @Inject constructor(
 
     fun updateElevation(elevationGain: Double) {
         _elevation.value = elevationGain
+    }
+
+    fun setStartStepCount(count: Int) {
+        startStepCount = count
+    }
+
+    fun updateSteps(currentStepCount: Int) {
+        val stepsInWorkout = currentStepCount - startStepCount
+        _steps.value = if (stepsInWorkout > 0) stepsInWorkout else 0
     }
 
     private fun startTimer() {
@@ -212,6 +307,8 @@ class LiveTrackingViewModel @Inject constructor(
         _calories.value = 0
         _elevation.value = 0.0
         _currentSpeed.value = 0f
+        _steps.value = 0
+        startStepCount = 0
         currentTrackId = null
         startTime = 0
         pausedDuration = 0

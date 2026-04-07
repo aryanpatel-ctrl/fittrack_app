@@ -40,7 +40,7 @@ class GoalWizardFragment : Fragment() {
             findNavController().navigateUp()
         }
 
-        val goalTypes = arrayOf("Run a 5K", "Run a 10K", "Half Marathon", "Marathon", "Weight Loss", "General Fitness")
+        val goalTypes = arrayOf("Run a 5K", "Run a 10K", "Half Marathon", "Marathon", "Steps Challenge", "Weight Loss", "General Fitness")
         binding.spinnerGoalType.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_dropdown_item_1line, goalTypes)
 
         val difficulties = arrayOf("Beginner", "Intermediate", "Advanced")

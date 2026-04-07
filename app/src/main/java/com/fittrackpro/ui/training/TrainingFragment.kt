@@ -25,7 +25,10 @@ class TrainingFragment : Fragment() {
     private val workoutAdapter = WorkoutAdapter { scheduledWorkout ->
         findNavController().navigate(
             R.id.action_training_to_workout_detail,
-            bundleOf("workoutId" to scheduledWorkout.workoutTemplateId)
+            bundleOf(
+                "workoutId" to scheduledWorkout.workoutTemplateId,
+                "scheduledWorkoutId" to scheduledWorkout.id
+            )
         )
     }
 

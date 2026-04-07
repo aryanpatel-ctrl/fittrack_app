@@ -31,7 +31,8 @@ class WorkoutDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val workoutId = arguments?.getString("workoutId") ?: return
-        viewModel.loadWorkout(workoutId)
+        val scheduledWorkoutId = arguments?.getString("scheduledWorkoutId")
+        viewModel.loadWorkout(workoutId, scheduledWorkoutId)
 
         setupUI()
         observeViewModel()
@@ -39,7 +40,6 @@ class WorkoutDetailFragment : Fragment() {
 
     private fun setupUI() {
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
-        binding.btnStartWorkout.setOnClickListener { viewModel.startWorkout() }
         binding.btnCompleteWorkout.setOnClickListener {
             viewModel.completeWorkout()
             findNavController().navigateUp()
@@ -57,8 +57,18 @@ class WorkoutDetailFragment : Fragment() {
                 binding.tvWorkoutType.text = it.type.replace("_", " ").replaceFirstChar { c -> c.uppercase() }
                 binding.tvDescription.text = it.description
                 binding.tvInstructions.text = it.instructions
-                it.targetDuration?.let { dur -> binding.tvTargetDuration.text = "$dur min" }
-                it.targetDistance?.let { dist -> binding.tvTargetDistance.text = String.format("%.1f km", dist) }
+
+                // targetDuration is in milliseconds, convert to minutes
+                it.targetDuration?.let { durationMs ->
+                    val minutes = durationMs / 60000
+                    binding.tvTargetDuration.text = "$minutes min"
+                }
+
+                // targetDistance is in meters, convert to km
+                it.targetDistance?.let { distanceMeters ->
+                    val distanceKm = distanceMeters / 1000f
+                    binding.tvTargetDistance.text = String.format("%.2f km", distanceKm)
+                }
             }
         }
     }

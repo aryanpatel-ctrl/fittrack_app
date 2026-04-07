@@ -45,8 +45,9 @@ class TrainingViewModel @Inject constructor(
     private fun loadUpcomingWorkouts() {
         viewModelScope.launch {
             val userId = userPreferences.userId ?: return@launch
-            scheduledWorkoutDao.getPendingWorkouts(userId).collect { workouts ->
-                _upcomingWorkouts.value = workouts.take(5)
+            // Show all workouts (pending, completed, skipped) so status changes are visible
+            scheduledWorkoutDao.getScheduledWorkoutsByUserId(userId).collect { workouts ->
+                _upcomingWorkouts.value = workouts.take(10)
             }
         }
     }

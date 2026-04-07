@@ -62,6 +62,30 @@ class ActivitiesFragment : Fragment() {
                 activitiesAdapter.submitList(activities)
             }
         }
+
+        // Observe monthly stats
+        viewModel.monthlyStats.observe(viewLifecycleOwner) { stats ->
+            updateMonthlyStats(stats)
+        }
+    }
+
+    private fun updateMonthlyStats(stats: MonthlyStats) {
+        // Workouts count
+        binding.tvWorkoutsCount.text = stats.workoutsCount.toString()
+
+        // Total distance (convert meters to km)
+        val distanceKm = stats.totalDistance / 1000
+        binding.tvTotalDistance.text = String.format("%.1f", distanceKm)
+
+        // Total time (convert milliseconds to hours:minutes format)
+        val totalMinutes = stats.totalDuration / 60000
+        val hours = totalMinutes / 60
+        val minutes = totalMinutes % 60
+        binding.tvTotalTime.text = if (hours > 0) {
+            String.format("%d:%02d", hours, minutes)
+        } else {
+            String.format("%d min", minutes)
+        }
     }
 
     override fun onDestroyView() {

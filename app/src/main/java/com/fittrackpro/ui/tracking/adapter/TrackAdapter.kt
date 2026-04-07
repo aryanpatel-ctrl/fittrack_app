@@ -8,13 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.fittrackpro.R
 import com.fittrackpro.data.local.database.entity.Track
 import com.fittrackpro.databinding.ItemActivityBinding
+import com.fittrackpro.ui.tracking.TrackWithStats
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class TrackAdapter(
     private val onItemClick: (Track) -> Unit
-) : ListAdapter<Track, TrackAdapter.TrackViewHolder>(DiffCallback()) {
+) : ListAdapter<TrackWithStats, TrackAdapter.TrackViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val binding = ItemActivityBinding.inflate(
@@ -35,21 +36,34 @@ class TrackAdapter(
             binding.root.setOnClickListener {
                 val pos = adapterPosition
                 if (pos != RecyclerView.NO_POSITION) {
-                    onItemClick(getItem(pos))
+                    onItemClick(getItem(pos).track)
                 }
             }
         }
 
-        fun bind(item: Track) {
-            binding.tvActivityName.text = item.name ?: item.activityType.replaceFirstChar { it.uppercase() }
+        fun bind(item: TrackWithStats) {
+            val track = item.track
+            val stats = item.stats
+
+            binding.tvActivityName.text = track.name ?: track.activityType.replaceFirstChar { it.uppercase() }
 
             val dateFormat = SimpleDateFormat("MMM d, yyyy • h:mm a", Locale.getDefault())
-            binding.tvActivityDate.text = dateFormat.format(Date(item.startTime))
+            binding.tvActivityDate.text = dateFormat.format(Date(track.startTime))
 
-            val iconRes = when (item.activityType) {
-                "running" -> R.drawable.ic_activities
-                "cycling" -> R.drawable.ic_activities
-                "walking" -> R.drawable.ic_activities
+            // Display distance
+            val distanceKm = (stats?.distance ?: 0.0) / 1000
+            binding.tvActivityDistance.text = String.format("%.2f km", distanceKm)
+
+            // Display duration
+            val durationMs = stats?.duration ?: 0L
+            val minutes = durationMs / 60000
+            val seconds = (durationMs % 60000) / 1000
+            binding.tvActivityDuration.text = String.format("%d:%02d", minutes, seconds)
+
+            val iconRes = when (track.activityType) {
+                "running" -> R.drawable.ic_running
+                "cycling" -> R.drawable.ic_cycling
+                "walking" -> R.drawable.ic_walking
                 "hiking" -> R.drawable.ic_elevation
                 else -> R.drawable.ic_activities
             }
@@ -57,11 +71,11 @@ class TrackAdapter(
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<Track>() {
-        override fun areItemsTheSame(oldItem: Track, newItem: Track): Boolean {
-            return oldItem.id == newItem.id
+    class DiffCallback : DiffUtil.ItemCallback<TrackWithStats>() {
+        override fun areItemsTheSame(oldItem: TrackWithStats, newItem: TrackWithStats): Boolean {
+            return oldItem.track.id == newItem.track.id
         }
-        override fun areContentsTheSame(oldItem: Track, newItem: Track): Boolean {
+        override fun areContentsTheSame(oldItem: TrackWithStats, newItem: TrackWithStats): Boolean {
             return oldItem == newItem
         }
     }

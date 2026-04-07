@@ -22,22 +22,18 @@ class WorkoutDetailViewModel @Inject constructor(
     private val _workout = MutableLiveData<WorkoutTemplate?>()
     val workout: LiveData<WorkoutTemplate?> = _workout
 
-    private var currentWorkoutId: String? = null
+    private var scheduledWorkoutId: String? = null
 
-    fun loadWorkout(workoutId: String) {
-        currentWorkoutId = workoutId
+    fun loadWorkout(workoutId: String, scheduledId: String?) {
+        scheduledWorkoutId = scheduledId
         viewModelScope.launch {
             _workout.value = workoutTemplateDao.getTemplateById(workoutId)
         }
     }
 
-    fun startWorkout() {
-        // Navigate to live tracking with workout context
-    }
-
     fun completeWorkout() {
         viewModelScope.launch {
-            currentWorkoutId?.let { id ->
+            scheduledWorkoutId?.let { id ->
                 scheduledWorkoutDao.markWorkoutCompleted(id, "completed", null, System.currentTimeMillis())
             }
         }
@@ -45,7 +41,7 @@ class WorkoutDetailViewModel @Inject constructor(
 
     fun skipWorkout() {
         viewModelScope.launch {
-            currentWorkoutId?.let { id ->
+            scheduledWorkoutId?.let { id ->
                 scheduledWorkoutDao.markWorkoutSkipped(id)
             }
         }
