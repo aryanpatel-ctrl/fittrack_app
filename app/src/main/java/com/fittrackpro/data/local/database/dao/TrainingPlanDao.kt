@@ -64,4 +64,11 @@ interface TrainingPlanDao {
         WHERE userId = :userId AND planId = :planId
     """)
     suspend fun incrementCompletedWorkouts(userId: String, planId: String, timestamp: Long)
+
+    // Achievement tracking - count completed training plans for user
+    @Query("SELECT COUNT(*) FROM plan_progress WHERE userId = :userId AND status = 'completed'")
+    suspend fun getCompletedPlansCount(userId: String): Int
+
+    @Delete
+    suspend fun deleteProgress(progress: PlanProgress)
 }

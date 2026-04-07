@@ -45,6 +45,11 @@ data class UserSettings(
     val useMetricUnits: Boolean = true,
     val enableNotifications: Boolean = true,
     val enableDarkMode: Boolean = false,
+    val enableWorkoutReminders: Boolean = true,
+    val enableChallengeAlerts: Boolean = true,
+    val enableAchievementAlerts: Boolean = true,
+    val shareActivities: Boolean = true,
+    val showOnLeaderboard: Boolean = true,
     val dailyGoalDistance: Float = 5000f, // meters
     val dailyGoalCalories: Int = 500,
     val weeklyGoalActivities: Int = 5,

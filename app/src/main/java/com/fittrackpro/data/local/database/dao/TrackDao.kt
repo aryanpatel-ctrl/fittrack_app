@@ -48,6 +48,9 @@ interface TrackDao {
     @Query("SELECT COUNT(*) FROM tracks WHERE userId = :userId AND startTime >= :startDate AND startTime <= :endDate")
     suspend fun getTrackCountByDateRange(userId: String, startDate: Long, endDate: Long): Int
 
+    @Query("SELECT * FROM tracks WHERE userId = :userId AND status = 'completed' ORDER BY startTime DESC")
+    fun getCompletedTracksByUser(userId: String): Flow<List<Track>>
+
     // Track Statistics operations
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertStatistics(statistics: TrackStatistics)

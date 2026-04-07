@@ -47,4 +47,7 @@ interface ScheduledWorkoutDao {
 
     @Query("SELECT COUNT(*) FROM scheduled_workouts WHERE userId = :userId AND status = 'pending' AND scheduledDate < :currentDate")
     suspend fun getMissedWorkoutCount(userId: String, currentDate: Long): Int
+
+    @Query("DELETE FROM scheduled_workouts WHERE userId = :userId")
+    suspend fun deleteAllWorkoutsForUser(userId: String)
 }

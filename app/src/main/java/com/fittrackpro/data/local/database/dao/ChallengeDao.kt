@@ -84,4 +84,12 @@ interface ChallengeDao {
 
     @Query("SELECT * FROM team_challenges WHERE challengeId = :challengeId ORDER BY totalProgress DESC")
     fun getTeamsByChallenge(challengeId: String): Flow<List<TeamChallenge>>
+
+    // Achievement tracking - count completed challenges for user
+    @Query("""
+        SELECT COUNT(*) FROM challenges c
+        INNER JOIN challenge_participants cp ON c.id = cp.challengeId
+        WHERE cp.userId = :userId AND c.status = 'completed'
+    """)
+    suspend fun getCompletedChallengesCount(userId: String): Int
 }

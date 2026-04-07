@@ -77,8 +77,8 @@ import com.fittrackpro.data.local.database.entity.*
         // Step tracking entities
         DailySteps::class
     ],
-    version = 1,
-    exportSchema = true
+    version = 2,
+    exportSchema = false
 )
 abstract class FitTrackDatabase : RoomDatabase() {
 
