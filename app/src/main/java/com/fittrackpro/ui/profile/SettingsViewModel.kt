@@ -11,7 +11,9 @@ import androidx.work.WorkManager
 import com.fittrackpro.data.local.database.dao.UserDao
 import com.fittrackpro.data.local.database.entity.UserSettings
 import com.fittrackpro.data.local.preferences.UserPreferences
+import com.fittrackpro.data.remote.firebase.FirebaseAuthService
 import com.fittrackpro.service.WaterReminderWorker
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -22,6 +24,7 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val userDao: UserDao,
     private val userPreferences: UserPreferences,
+    private val firebaseAuthService: FirebaseAuthService,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -31,11 +34,16 @@ class SettingsViewModel @Inject constructor(
     private val _logoutComplete = MutableLiveData<Boolean>()
     val logoutComplete: LiveData<Boolean> = _logoutComplete
 
-    private val _exportProgress = MutableLiveData<Boolean>()
-    val exportProgress: LiveData<Boolean> = _exportProgress
-
     private val _waterRemindersEnabled = MutableLiveData<Boolean>()
     val waterRemindersEnabled: LiveData<Boolean> = _waterRemindersEnabled
+
+    private val _passwordChangeResult = MutableLiveData<PasswordChangeResult?>()
+    val passwordChangeResult: LiveData<PasswordChangeResult?> = _passwordChangeResult
+
+    sealed class PasswordChangeResult {
+        data object Success : PasswordChangeResult()
+        data class Error(val message: String) : PasswordChangeResult()
+    }
 
     init {
         loadSettings()
@@ -52,14 +60,6 @@ class SettingsViewModel @Inject constructor(
                 _settings.value = userDao.getSettingsByUserId(userId)
             }
         }
-    }
-
-    fun setNotificationsEnabled(enabled: Boolean) {
-        updateSettings { it.copy(enableNotifications = enabled) }
-    }
-
-    fun setDarkModeEnabled(enabled: Boolean) {
-        updateSettings { it.copy(enableDarkMode = enabled) }
     }
 
     fun setUseMetric(useMetric: Boolean) {
@@ -104,18 +104,65 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun exportData() {
+    fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String) {
         viewModelScope.launch {
-            _exportProgress.value = true
-            _exportProgress.value = false
+            // Validate inputs
+            if (currentPassword.isEmpty()) {
+                _passwordChangeResult.value = PasswordChangeResult.Error("Current password is required")
+                return@launch
+            }
+
+            if (newPassword.isEmpty()) {
+                _passwordChangeResult.value = PasswordChangeResult.Error("New password is required")
+                return@launch
+            }
+
+            if (newPassword.length < 8) {
+                _passwordChangeResult.value = PasswordChangeResult.Error("Password must be at least 8 characters")
+                return@launch
+            }
+
+            if (newPassword != confirmPassword) {
+                _passwordChangeResult.value = PasswordChangeResult.Error("Passwords do not match")
+                return@launch
+            }
+
+            if (currentPassword == newPassword) {
+                _passwordChangeResult.value = PasswordChangeResult.Error("New password must be different from current password")
+                return@launch
+            }
+
+            // Change password via Firebase Auth
+            try {
+                firebaseAuthService.changePassword(currentPassword, newPassword)
+                _passwordChangeResult.value = PasswordChangeResult.Success
+            } catch (e: FirebaseAuthInvalidCredentialsException) {
+                _passwordChangeResult.value = PasswordChangeResult.Error("Current password is incorrect")
+            } catch (e: Exception) {
+                _passwordChangeResult.value = PasswordChangeResult.Error("Failed to change password: ${e.message}")
+            }
         }
+    }
+
+    fun clearPasswordChangeResult() {
+        _passwordChangeResult.value = null
     }
 
     fun deleteAccount() {
         viewModelScope.launch {
-            userPreferences.userId?.let { userId ->
-                val user = userDao.getUserById(userId)
-                user?.let { userDao.deleteUser(it) }
+            try {
+                // Delete from Firebase Auth
+                firebaseAuthService.deleteAccount()
+
+                // Delete local user data
+                userPreferences.userId?.let { userId ->
+                    val user = userDao.getUserById(userId)
+                    user?.let { userDao.deleteUser(it) }
+                }
+                userPreferences.clearAll()
+                _logoutComplete.value = true
+            } catch (e: Exception) {
+                // If Firebase deletion fails, still clear local data
                 userPreferences.clearAll()
                 _logoutComplete.value = true
             }
@@ -124,6 +171,7 @@ class SettingsViewModel @Inject constructor(
 
     fun logout() {
         viewModelScope.launch {
+            firebaseAuthService.signOut()
             userPreferences.clearAll()
             _logoutComplete.value = true
         }

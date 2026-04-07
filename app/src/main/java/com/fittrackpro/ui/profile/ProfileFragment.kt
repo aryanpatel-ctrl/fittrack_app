@@ -1,19 +1,25 @@
 package com.fittrackpro.ui.profile
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.Spinner
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.fittrackpro.R
 import com.fittrackpro.databinding.FragmentProfileBinding
+import com.fittrackpro.ui.auth.AuthActivity
 import com.fittrackpro.util.BmiCalculator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -69,7 +75,7 @@ class ProfileFragment : Fragment() {
 
         // Edit profile button
         binding.btnEditProfile.setOnClickListener {
-            // Navigate to edit profile or show dialog
+            showEditProfileDialog()
         }
     }
 
@@ -134,6 +140,24 @@ class ProfileFragment : Fragment() {
                 "-- cm"
             }
         }
+
+        viewModel.profileUpdated.observe(viewLifecycleOwner) { updated ->
+            if (updated) {
+                Toast.makeText(requireContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.loggedOut.observe(viewLifecycleOwner) { loggedOut ->
+            if (loggedOut) {
+                // Sign out from Firebase
+                FirebaseAuth.getInstance().signOut()
+                // Navigate to auth screen
+                val intent = Intent(requireContext(), AuthActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                requireActivity().finish()
+            }
+        }
     }
 
     private fun showBmiEditDialog() {
@@ -177,6 +201,79 @@ class ProfileFragment : Fragment() {
 
                 if (weight != null && weight > 0 && height != null && height > 0) {
                     viewModel.updateUserBodyMetrics(weight, height)
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showEditProfileDialog() {
+        val context = requireContext()
+
+        // Create input fields
+        val nameInput = EditText(context).apply {
+            hint = "Name"
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                    android.text.InputType.TYPE_TEXT_FLAG_CAP_WORDS
+            setText(viewModel.userName.value ?: "")
+        }
+
+        val emailInput = EditText(context).apply {
+            hint = "Email"
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or
+                    android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+            setText(viewModel.userEmail.value ?: "")
+        }
+
+        // Gender spinner
+        val genderOptions = arrayOf("Select Gender", "Male", "Female", "Other", "Prefer not to say")
+        val genderSpinner = Spinner(context).apply {
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, genderOptions)
+            // Set current selection
+            val currentGender = viewModel.userGender.value
+            val position = when (currentGender?.lowercase()) {
+                "male" -> 1
+                "female" -> 2
+                "other" -> 3
+                "prefer not to say" -> 4
+                else -> 0
+            }
+            setSelection(position)
+        }
+
+        // Create layout
+        val layout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(48, 32, 48, 0)
+            addView(nameInput)
+            addView(emailInput.apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = 24 }
+            })
+            addView(genderSpinner.apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { topMargin = 24 }
+            })
+        }
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle("Edit Profile")
+            .setMessage("Update your profile information")
+            .setView(layout)
+            .setPositiveButton("Save") { _, _ ->
+                val name = nameInput.text.toString().trim()
+                val email = emailInput.text.toString().trim()
+                val genderPosition = genderSpinner.selectedItemPosition
+                val gender = if (genderPosition > 0) genderOptions[genderPosition] else null
+
+                if (name.isNotEmpty() && email.isNotEmpty()) {
+                    viewModel.updateUserProfile(name, email, gender)
+                } else {
+                    Toast.makeText(context, "Name and email are required", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)

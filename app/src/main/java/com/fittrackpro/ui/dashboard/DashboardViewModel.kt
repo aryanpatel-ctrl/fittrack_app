@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.fittrackpro.data.local.database.dao.AchievementDao
 import com.fittrackpro.data.local.database.dao.StepDao
 import com.fittrackpro.data.local.database.dao.TrackDao
 import com.fittrackpro.data.local.database.dao.UserDao
@@ -27,6 +28,7 @@ class DashboardViewModel @Inject constructor(
     private val trackDao: TrackDao,
     private val userDao: UserDao,
     private val stepDao: StepDao,
+    private val achievementDao: AchievementDao,
     private val weatherRepository: WeatherRepository
 ) : ViewModel() {
 
@@ -53,15 +55,41 @@ class DashboardViewModel @Inject constructor(
     private val _isWeatherLoading = MutableLiveData<Boolean>()
     val isWeatherLoading: LiveData<Boolean> = _isWeatherLoading
 
+    // Streak and Level data
+    private val _currentStreak = MutableLiveData<Int>()
+    val currentStreak: LiveData<Int> = _currentStreak
+
+    private val _userLevel = MutableLiveData<Int>()
+    val userLevel: LiveData<Int> = _userLevel
+
+    private val _userXp = MutableLiveData<Int>()
+    val userXp: LiveData<Int> = _userXp
+
     init {
         loadUserData()
         loadTodayStats()
         loadWeeklyData()
         loadStepData()
+        loadStreakAndLevel()
     }
 
     private fun loadUserData() {
         _userName.value = userPreferences.userName
+    }
+
+    private fun loadStreakAndLevel() {
+        viewModelScope.launch {
+            val userId = userPreferences.userId ?: return@launch
+
+            // Load current streak (daily_activity type)
+            val streak = achievementDao.getStreakByType(userId, "daily_activity")
+            _currentStreak.value = streak?.currentCount ?: 0
+
+            // Load user level and XP from UserStats
+            val stats = userDao.getStatsByUserId(userId)
+            _userLevel.value = stats?.level ?: 1
+            _userXp.value = stats?.totalXp ?: 0
+        }
     }
 
     private fun loadTodayStats() {
@@ -316,6 +344,7 @@ class DashboardViewModel @Inject constructor(
     fun refresh() {
         loadTodayStats()
         loadStepData()
+        loadStreakAndLevel()
     }
 
     fun refreshWeather(latitude: Double, longitude: Double) {

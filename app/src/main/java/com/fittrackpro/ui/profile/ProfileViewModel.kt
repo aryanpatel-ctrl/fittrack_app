@@ -48,6 +48,15 @@ class ProfileViewModel @Inject constructor(
     private val _userHeight = MutableLiveData<Float?>()
     val userHeight: LiveData<Float?> = _userHeight
 
+    private val _userEmail = MutableLiveData<String?>()
+    val userEmail: LiveData<String?> = _userEmail
+
+    private val _userGender = MutableLiveData<String?>()
+    val userGender: LiveData<String?> = _userGender
+
+    private val _profileUpdated = MutableLiveData<Boolean>()
+    val profileUpdated: LiveData<Boolean> = _profileUpdated
+
     init {
         loadUserData()
     }
@@ -55,6 +64,8 @@ class ProfileViewModel @Inject constructor(
     private fun loadUserData() {
         viewModelScope.launch {
             _userName.value = userPreferences.userName
+            // Load email from preferences (set during login)
+            _userEmail.value = userPreferences.userEmail
 
             val userId = userPreferences.userId
             if (userId != null) {
@@ -69,11 +80,18 @@ class ProfileViewModel @Inject constructor(
                 val streak = achievementDao.getStreakByType(userId, "daily_activity")
                 _currentStreak.value = streak?.currentCount ?: 0
 
-                // Load user profile for BMI
+                // Load user profile for BMI and profile info
                 val user = userDao.getUserById(userId)
                 user?.let {
                     _userWeight.value = it.weight
                     _userHeight.value = it.height
+                    // Use email from preferences if not in database
+                    if (it.email.isNullOrEmpty()) {
+                        _userEmail.value = userPreferences.userEmail
+                    } else {
+                        _userEmail.value = it.email
+                    }
+                    _userGender.value = it.gender
                     calculateBmi(it.weight, it.height)
                 }
             } else {
@@ -149,6 +167,34 @@ class ProfileViewModel @Inject constructor(
                 _userWeight.value = weight
                 _userHeight.value = height
                 calculateBmi(weight, height)
+            }
+        }
+    }
+
+    fun updateUserProfile(name: String, email: String, gender: String?) {
+        viewModelScope.launch {
+            val userId = userPreferences.userId ?: return@launch
+
+            // Update user in database
+            val user = userDao.getUserById(userId)
+            user?.let {
+                val updatedUser = it.copy(
+                    name = name,
+                    email = email,
+                    gender = gender,
+                    updatedAt = System.currentTimeMillis()
+                )
+                userDao.updateUser(updatedUser)
+
+                // Update preferences
+                userPreferences.userName = name
+                userPreferences.userEmail = email
+
+                // Update LiveData
+                _userName.value = name
+                _userEmail.value = email
+                _userGender.value = gender
+                _profileUpdated.value = true
             }
         }
     }

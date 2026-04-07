@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.fittrackpro.R
 import com.fittrackpro.databinding.FragmentDashboardBinding
 import com.fittrackpro.service.StepCounterService
@@ -103,6 +104,20 @@ class DashboardFragment : Fragment() {
 
         binding.cardQuickWalk.setOnClickListener {
             startActivityWithType("walking")
+        }
+
+        // Step goal - tap on steps to change goal
+        binding.tvStepsCount.setOnClickListener {
+            showStepGoalDialog()
+        }
+
+        binding.progressSteps.setOnClickListener {
+            showStepGoalDialog()
+        }
+
+        // View All Progress - navigate to Analytics
+        binding.tvViewAllProgress.setOnClickListener {
+            findNavController().navigate(R.id.action_dashboard_to_analytics)
         }
     }
 
@@ -242,6 +257,16 @@ class DashboardFragment : Fragment() {
         // Observe step data from ViewModel (database-backed)
         viewModel.todaySteps.observe(viewLifecycleOwner) { stepData ->
             updateStepDisplay(stepData)
+        }
+
+        // Observe streak data
+        viewModel.currentStreak.observe(viewLifecycleOwner) { streak ->
+            binding.tvStreakCount.text = if (streak > 0) "$streak days" else "0 days"
+        }
+
+        // Observe level data
+        viewModel.userLevel.observe(viewLifecycleOwner) { level ->
+            binding.tvLevel.text = "Level $level"
         }
     }
 
