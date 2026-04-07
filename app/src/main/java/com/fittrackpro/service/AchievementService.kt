@@ -10,7 +10,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.fittrackpro.R
 import com.fittrackpro.data.local.database.dao.AchievementDao
+import com.fittrackpro.data.local.database.dao.ChallengeDao
 import com.fittrackpro.data.local.database.dao.TrackDao
+import com.fittrackpro.data.local.database.dao.TrainingPlanDao
 import com.fittrackpro.data.local.database.dao.UserDao
 import com.fittrackpro.data.local.database.entity.Achievement
 import com.fittrackpro.data.local.database.entity.UserAchievement
@@ -44,7 +46,9 @@ class AchievementService @Inject constructor(
     private val achievementDao: AchievementDao,
     private val trackDao: TrackDao,
     private val userDao: UserDao,
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val challengeDao: ChallengeDao,
+    private val trainingPlanDao: TrainingPlanDao
 ) {
     companion object {
         private const val CHANNEL_ID = "achievement_notifications"
@@ -132,6 +136,10 @@ class AchievementService @Inject constructor(
             it.weatherCondition?.lowercase()?.contains("rain") == true
         }
 
+        // Get completed challenges and training plans count
+        val completedChallenges = challengeDao.getCompletedChallengesCount(userId)
+        val completedPlans = trainingPlanDao.getCompletedPlansCount(userId)
+
         return UserStats(
             totalDistance = totalDistance,
             totalWorkouts = totalWorkouts,
@@ -141,8 +149,8 @@ class AchievementService @Inject constructor(
             fastestPace = allStats.filter { it.avgPace > 0 }.minOfOrNull { it.avgPace } ?: 0f,
             hasEarlyMorningWorkout = hasEarlyMorningWorkout,
             hasRainyWorkout = hasRainyWorkout,
-            challengesCompleted = 0, // TODO: Get from challenge dao
-            plansCompleted = 0 // TODO: Get from training plan dao
+            challengesCompleted = completedChallenges,
+            plansCompleted = completedPlans
         )
     }
 
