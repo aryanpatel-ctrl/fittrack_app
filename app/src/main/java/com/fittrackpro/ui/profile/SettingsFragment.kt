@@ -50,6 +50,10 @@ class SettingsFragment : Fragment() {
             viewModel.setDarkModeEnabled(isChecked)
         }
 
+        binding.switchWaterReminders.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.setWaterRemindersEnabled(isChecked)
+        }
+
         binding.layoutChangePassword.setOnClickListener { }
 
         binding.layoutExportData.setOnClickListener {
@@ -78,6 +82,10 @@ class SettingsFragment : Fragment() {
             if (complete) {
                 requireActivity().finish()
             }
+        }
+
+        viewModel.waterRemindersEnabled.observe(viewLifecycleOwner) { enabled ->
+            binding.switchWaterReminders.isChecked = enabled
         }
     }
 

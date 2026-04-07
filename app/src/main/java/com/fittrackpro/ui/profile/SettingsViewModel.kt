@@ -1,20 +1,28 @@
 package com.fittrackpro.ui.profile
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.fittrackpro.data.local.database.dao.UserDao
 import com.fittrackpro.data.local.database.entity.UserSettings
 import com.fittrackpro.data.local.preferences.UserPreferences
+import com.fittrackpro.service.WaterReminderWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val userDao: UserDao,
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _settings = MutableLiveData<UserSettings?>()
@@ -26,8 +34,16 @@ class SettingsViewModel @Inject constructor(
     private val _exportProgress = MutableLiveData<Boolean>()
     val exportProgress: LiveData<Boolean> = _exportProgress
 
+    private val _waterRemindersEnabled = MutableLiveData<Boolean>()
+    val waterRemindersEnabled: LiveData<Boolean> = _waterRemindersEnabled
+
     init {
         loadSettings()
+        loadWaterRemindersState()
+    }
+
+    private fun loadWaterRemindersState() {
+        _waterRemindersEnabled.value = userPreferences.waterRemindersEnabled
     }
 
     private fun loadSettings() {
@@ -48,6 +64,34 @@ class SettingsViewModel @Inject constructor(
 
     fun setUseMetric(useMetric: Boolean) {
         updateSettings { it.copy(useMetricUnits = useMetric) }
+    }
+
+    fun setWaterRemindersEnabled(enabled: Boolean) {
+        userPreferences.waterRemindersEnabled = enabled
+        _waterRemindersEnabled.value = enabled
+
+        if (enabled) {
+            scheduleWaterReminders()
+        } else {
+            cancelWaterReminders()
+        }
+    }
+
+    private fun scheduleWaterReminders() {
+        val workRequest = PeriodicWorkRequestBuilder<WaterReminderWorker>(
+            2, TimeUnit.HOURS,
+            15, TimeUnit.MINUTES // Flex interval
+        ).build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            WaterReminderWorker.WORK_NAME,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            workRequest
+        )
+    }
+
+    private fun cancelWaterReminders() {
+        WorkManager.getInstance(context).cancelUniqueWork(WaterReminderWorker.WORK_NAME)
     }
 
     private fun updateSettings(transform: (UserSettings) -> UserSettings) {

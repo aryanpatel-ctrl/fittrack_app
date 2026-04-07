@@ -61,6 +61,10 @@ class UserPreferences @Inject constructor(context: Context) {
         get() = prefs.getLong(KEY_LAST_SYNC, 0L)
         set(value) = prefs.edit().putLong(KEY_LAST_SYNC, value).apply()
 
+    var waterRemindersEnabled: Boolean
+        get() = prefs.getBoolean(KEY_WATER_REMINDERS, false)
+        set(value) = prefs.edit().putBoolean(KEY_WATER_REMINDERS, value).apply()
+
     fun clearUserData() {
         prefs.edit().apply {
             remove(KEY_IS_LOGGED_IN)
@@ -91,5 +95,6 @@ class UserPreferences @Inject constructor(context: Context) {
         private const val KEY_DAILY_GOAL_DISTANCE = "daily_goal_distance"
         private const val KEY_DAILY_GOAL_CALORIES = "daily_goal_calories"
         private const val KEY_LAST_SYNC = "last_sync"
+        private const val KEY_WATER_REMINDERS = "water_reminders_enabled"
     }
 }
