@@ -145,22 +145,36 @@ class NutritionFragment : Fragment() {
             summary?.let {
                 // Calories
                 binding.tvCaloriesConsumed.text = "${it.totalCalories}"
-                binding.tvCalorieGoal.text = "/ ${viewModel.calorieGoal} kcal"
+                val calorieGoal = viewModel.calorieGoal.value ?: 2000
+                binding.tvCalorieGoal.text = "/ $calorieGoal kcal"
                 binding.progressCaloriesCircular.progress =
-                    ((it.totalCalories.toFloat() / viewModel.calorieGoal) * 100).toInt().coerceAtMost(100)
+                    ((it.totalCalories.toFloat() / calorieGoal) * 100).toInt().coerceAtMost(100)
 
                 // Macros
-                binding.tvProtein.text = "${it.totalProtein}g"
+                val proteinGoal = viewModel.proteinGoal.value ?: 150
+                val carbsGoal = viewModel.carbsGoal.value ?: 250
+                val fatGoal = viewModel.fatGoal.value ?: 65
+
+                binding.tvProtein.text = "${it.totalProtein.toInt()}g"
                 binding.progressProtein.progress =
-                    ((it.totalProtein.toFloat() / viewModel.proteinGoal) * 100).toInt().coerceAtMost(100)
+                    ((it.totalProtein / proteinGoal) * 100).toInt().coerceAtMost(100)
 
-                binding.tvCarbs.text = "${it.totalCarbs}g"
+                binding.tvCarbs.text = "${it.totalCarbs.toInt()}g"
                 binding.progressCarbs.progress =
-                    ((it.totalCarbs.toFloat() / viewModel.carbsGoal) * 100).toInt().coerceAtMost(100)
+                    ((it.totalCarbs / carbsGoal) * 100).toInt().coerceAtMost(100)
 
-                binding.tvFat.text = "${it.totalFat}g"
+                binding.tvFat.text = "${it.totalFat.toInt()}g"
                 binding.progressFat.progress =
-                    ((it.totalFat.toFloat() / viewModel.fatGoal) * 100).toInt().coerceAtMost(100)
+                    ((it.totalFat / fatGoal) * 100).toInt().coerceAtMost(100)
+            }
+        }
+
+        // Observe calorie goal changes to update UI
+        viewModel.calorieGoal.observe(viewLifecycleOwner) { goal ->
+            viewModel.dailySummary.value?.let { summary ->
+                binding.tvCalorieGoal.text = "/ $goal kcal"
+                binding.progressCaloriesCircular.progress =
+                    ((summary.totalCalories.toFloat() / goal) * 100).toInt().coerceAtMost(100)
             }
         }
 

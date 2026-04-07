@@ -48,12 +48,4 @@ class SocialViewModel @Inject constructor(
             }
         }
     }
-
-    fun sendInvite(email: String) {
-        viewModelScope.launch {
-            // In a real app, this would send an email invitation via backend API
-            // For now, just log the invite
-            // You could integrate with email intent or backend service here
-        }
-    }
 }

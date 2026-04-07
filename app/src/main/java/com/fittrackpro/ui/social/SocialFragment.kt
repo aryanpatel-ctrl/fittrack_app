@@ -4,9 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -15,8 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.fittrackpro.R
 import com.fittrackpro.databinding.FragmentSocialBinding
 import com.fittrackpro.ui.social.adapter.ChallengeAdapter
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -59,36 +54,9 @@ class SocialFragment : Fragment() {
             findNavController().navigate(R.id.action_social_to_create_challenge)
         }
 
-        binding.btnInvite.setOnClickListener {
-            showInviteEmailDialog()
-        }
-
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.loadMyChallenges()
         }
-    }
-
-    private fun showInviteEmailDialog() {
-        val dialogView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.dialog_invite_email, null)
-
-        val emailInput = dialogView.findViewById<TextInputEditText>(R.id.et_email)
-
-        AlertDialog.Builder(requireContext())
-            .setTitle(R.string.invite_friend)
-            .setView(dialogView)
-            .setPositiveButton(R.string.send_invite) { dialog, _ ->
-                val email = emailInput.text?.toString()?.trim()
-                if (!email.isNullOrEmpty() && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                    viewModel.sendInvite(email)
-                    Toast.makeText(requireContext(), getString(R.string.invite_sent, email), Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(requireContext(), R.string.invalid_email, Toast.LENGTH_SHORT).show()
-                }
-                dialog.dismiss()
-            }
-            .setNegativeButton(R.string.cancel, null)
-            .show()
     }
 
     private fun observeViewModel() {

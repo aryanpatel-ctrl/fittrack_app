@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fittrackpro.data.local.database.dao.NutritionDao
+import com.fittrackpro.data.local.database.dao.UserDao
 import com.fittrackpro.data.local.database.entity.DailyNutritionSummary
 import com.fittrackpro.data.local.database.entity.HydrationLog
 import com.fittrackpro.data.local.database.entity.NutritionLog
@@ -22,6 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class NutritionViewModel @Inject constructor(
     private val nutritionDao: NutritionDao,
+    private val userDao: UserDao,
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
@@ -37,15 +39,74 @@ class NutritionViewModel @Inject constructor(
     private val _hydration = MutableLiveData<List<HydrationLog>>()
     val hydration: LiveData<List<HydrationLog>> = _hydration
 
-    // Goals (could be loaded from user settings)
-    val calorieGoal = 2000
-    val proteinGoal = 150
-    val carbsGoal = 250
-    val fatGoal = 65
-    val waterGoal = 2500 // ml
+    // Dynamic nutrition goals based on user profile
+    private val _calorieGoal = MutableLiveData(2000)
+    val calorieGoal: LiveData<Int> = _calorieGoal
+
+    private val _proteinGoal = MutableLiveData(150)
+    val proteinGoal: LiveData<Int> = _proteinGoal
+
+    private val _carbsGoal = MutableLiveData(250)
+    val carbsGoal: LiveData<Int> = _carbsGoal
+
+    private val _fatGoal = MutableLiveData(65)
+    val fatGoal: LiveData<Int> = _fatGoal
+
+    val waterGoal = 2500 // ml - standard recommendation
 
     init {
         loadDataForDate(Date())
+        calculateNutritionGoals()
+    }
+
+    /**
+     * Calculate nutrition goals based on user's weight, height, and gender
+     * Uses Mifflin-St Jeor equation for BMR and moderate activity multiplier
+     */
+    private fun calculateNutritionGoals() {
+        viewModelScope.launch {
+            userPreferences.userId?.let { userId ->
+                val user = userDao.getUserById(userId)
+                user?.let {
+                    val weight = it.weight ?: 70f // Default 70kg
+                    val height = it.height ?: 170f // Default 170cm
+                    val age = calculateAge(it.dateOfBirth) ?: 30 // Default 30 years
+                    val isMale = it.gender?.lowercase() != "female"
+
+                    // Mifflin-St Jeor Equation for BMR
+                    val bmr = if (isMale) {
+                        (10 * weight) + (6.25 * height) - (5 * age) + 5
+                    } else {
+                        (10 * weight) + (6.25 * height) - (5 * age) - 161
+                    }
+
+                    // TDEE with moderate activity level (1.55 multiplier)
+                    val tdee = (bmr * 1.55).toInt()
+
+                    // Macronutrient distribution: 30% protein, 40% carbs, 30% fat
+                    // Protein: 4 cal/g, Carbs: 4 cal/g, Fat: 9 cal/g
+                    val proteinCals = tdee * 0.30
+                    val carbsCals = tdee * 0.40
+                    val fatCals = tdee * 0.30
+
+                    _calorieGoal.value = tdee
+                    _proteinGoal.value = (proteinCals / 4).toInt()
+                    _carbsGoal.value = (carbsCals / 4).toInt()
+                    _fatGoal.value = (fatCals / 9).toInt()
+                }
+            }
+        }
+    }
+
+    private fun calculateAge(dateOfBirth: Long?): Int? {
+        if (dateOfBirth == null) return null
+        val today = Calendar.getInstance()
+        val birthDate = Calendar.getInstance().apply { timeInMillis = dateOfBirth }
+        var age = today.get(Calendar.YEAR) - birthDate.get(Calendar.YEAR)
+        if (today.get(Calendar.DAY_OF_YEAR) < birthDate.get(Calendar.DAY_OF_YEAR)) {
+            age--
+        }
+        return age
     }
 
     fun previousDay() {

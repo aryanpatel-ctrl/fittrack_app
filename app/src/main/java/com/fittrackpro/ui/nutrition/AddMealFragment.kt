@@ -23,6 +23,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.fittrackpro.databinding.FragmentAddMealBinding
+import com.fittrackpro.ui.nutrition.adapter.FoodSearchAdapter
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
@@ -44,6 +45,7 @@ class AddMealFragment : Fragment() {
     private var cameraProvider: ProcessCameraProvider? = null
     private var barcodeScanner: BarcodeScanner? = null
     private var isScanning = false
+    private lateinit var foodSearchAdapter: FoodSearchAdapter
 
     private val cameraPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -131,11 +133,18 @@ class AddMealFragment : Fragment() {
             viewModel.addMealEntry(name, calories, protein, carbs, fat, quantity, mealType)
         }
 
+        // Setup food search RecyclerView
+        foodSearchAdapter = FoodSearchAdapter { foodItem ->
+            viewModel.selectFood(foodItem)
+            binding.etSearchFood.setText("")
+        }
         binding.rvSearchResults.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvSearchResults.adapter = foodSearchAdapter
     }
 
     private fun observeViewModel() {
         viewModel.searchResults.observe(viewLifecycleOwner) { results ->
+            foodSearchAdapter.submitList(results)
             binding.rvSearchResults.visibility = if (results.isNotEmpty()) View.VISIBLE else View.GONE
         }
 

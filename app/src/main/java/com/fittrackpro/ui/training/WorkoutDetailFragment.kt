@@ -1,5 +1,6 @@
 package com.fittrackpro.ui.training
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -40,14 +41,40 @@ class WorkoutDetailFragment : Fragment() {
 
     private fun setupUI() {
         binding.btnBack.setOnClickListener { findNavController().navigateUp() }
+
         binding.btnCompleteWorkout.setOnClickListener {
-            viewModel.completeWorkout()
-            findNavController().navigateUp()
+            showCompleteConfirmationDialog()
         }
+
         binding.btnSkipWorkout.setOnClickListener {
-            viewModel.skipWorkout()
-            findNavController().navigateUp()
+            showSkipConfirmationDialog()
         }
+    }
+
+    private fun showCompleteConfirmationDialog() {
+        val workoutName = viewModel.workout.value?.name ?: "this workout"
+        AlertDialog.Builder(requireContext())
+            .setTitle("Complete Workout")
+            .setMessage("Mark \"$workoutName\" as completed?")
+            .setPositiveButton("Complete") { _, _ ->
+                viewModel.completeWorkout()
+                findNavController().navigateUp()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun showSkipConfirmationDialog() {
+        val workoutName = viewModel.workout.value?.name ?: "this workout"
+        AlertDialog.Builder(requireContext())
+            .setTitle("Skip Workout")
+            .setMessage("Are you sure you want to skip \"$workoutName\"? You can still complete it later from your workout list.")
+            .setPositiveButton("Skip") { _, _ ->
+                viewModel.skipWorkout()
+                findNavController().navigateUp()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun observeViewModel() {

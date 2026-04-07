@@ -8,13 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.fittrackpro.R
 import com.fittrackpro.data.local.database.entity.ScheduledWorkout
 import com.fittrackpro.databinding.ItemWorkoutBinding
+import com.fittrackpro.ui.training.ScheduledWorkoutWithName
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 class WorkoutAdapter(
     private val onItemClick: (ScheduledWorkout) -> Unit
-) : ListAdapter<ScheduledWorkout, WorkoutAdapter.WorkoutViewHolder>(DiffCallback()) {
+) : ListAdapter<ScheduledWorkoutWithName, WorkoutAdapter.WorkoutViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WorkoutViewHolder {
         val binding = ItemWorkoutBinding.inflate(
@@ -35,18 +36,19 @@ class WorkoutAdapter(
             binding.root.setOnClickListener {
                 val pos = adapterPosition
                 if (pos != RecyclerView.NO_POSITION) {
-                    onItemClick(getItem(pos))
+                    onItemClick(getItem(pos).scheduledWorkout)
                 }
             }
         }
 
-        fun bind(item: ScheduledWorkout) {
+        fun bind(item: ScheduledWorkoutWithName) {
+            val scheduled = item.scheduledWorkout
             val dateFormat = SimpleDateFormat("EEE, MMM d", Locale.getDefault())
-            binding.tvWorkoutDate.text = dateFormat.format(Date(item.scheduledDate))
-            binding.tvWorkoutName.text = item.notes ?: "Workout"
-            binding.tvWorkoutStatus.text = item.status.replaceFirstChar { it.uppercase() }
+            binding.tvWorkoutDate.text = dateFormat.format(Date(scheduled.scheduledDate))
+            binding.tvWorkoutName.text = item.workoutName
+            binding.tvWorkoutStatus.text = scheduled.status.replaceFirstChar { it.uppercase() }
 
-            val statusColor = when (item.status) {
+            val statusColor = when (scheduled.status) {
                 "completed" -> R.color.success
                 "skipped" -> R.color.error
                 "pending" -> R.color.warning
@@ -56,11 +58,11 @@ class WorkoutAdapter(
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<ScheduledWorkout>() {
-        override fun areItemsTheSame(oldItem: ScheduledWorkout, newItem: ScheduledWorkout): Boolean {
-            return oldItem.id == newItem.id
+    class DiffCallback : DiffUtil.ItemCallback<ScheduledWorkoutWithName>() {
+        override fun areItemsTheSame(oldItem: ScheduledWorkoutWithName, newItem: ScheduledWorkoutWithName): Boolean {
+            return oldItem.scheduledWorkout.id == newItem.scheduledWorkout.id
         }
-        override fun areContentsTheSame(oldItem: ScheduledWorkout, newItem: ScheduledWorkout): Boolean {
+        override fun areContentsTheSame(oldItem: ScheduledWorkoutWithName, newItem: ScheduledWorkoutWithName): Boolean {
             return oldItem == newItem
         }
     }
