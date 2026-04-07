@@ -46,6 +46,10 @@ class ActivitiesViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
+    // Store all activities for filtering
+    private var allActivities: List<TrackWithStats> = emptyList()
+    private var currentFilter: String? = null // null means "all"
+
     init {
         loadActivities()
     }
@@ -61,18 +65,44 @@ class ActivitiesViewModel @Inject constructor(
                         val stats = trackDao.getStatisticsByTrackId(track.id)
                         TrackWithStats(track, stats)
                     }
-                    _activities.value = tracksWithStats
+                    allActivities = tracksWithStats
+                    applyFilter()
                     _isLoading.value = false
 
-                    // Calculate monthly stats
+                    // Calculate monthly stats (always from all activities)
                     calculateMonthlyStats(tracksWithStats)
                 }
             } else {
+                allActivities = emptyList()
                 _activities.value = emptyList()
                 _monthlyStats.value = MonthlyStats()
                 _isLoading.value = false
             }
         }
+    }
+
+    /**
+     * Filter activities by type
+     * @param activityType The type to filter by (running, cycling, walking) or null for all
+     */
+    fun filterByType(activityType: String?) {
+        currentFilter = activityType
+        applyFilter()
+    }
+
+    private fun applyFilter() {
+        _activities.value = if (currentFilter == null) {
+            allActivities
+        } else {
+            allActivities.filter { it.track.activityType == currentFilter }
+        }
+    }
+
+    /**
+     * Refresh activities list
+     */
+    fun refresh() {
+        loadActivities()
     }
 
     private fun calculateMonthlyStats(tracksWithStats: List<TrackWithStats>) {

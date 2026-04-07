@@ -97,11 +97,28 @@ class LiveTrackingActivity : AppCompatActivity(), OnMapReadyCallback, SensorEven
         binding = ActivityLiveTrackingBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupActivityType()
         setupStepCounter()
         setupMap()
         setupUI()
         checkPermissions()
         observeViewModel()
+    }
+
+    private fun setupActivityType() {
+        // Get activity type from intent (from Quick Start cards or default)
+        val activityType = intent.getStringExtra("activity_type") ?: "running"
+        viewModel.setActivityType(activityType)
+
+        // Update the chip to show the correct activity type
+        val (chipText, chipIcon) = when (activityType) {
+            "running" -> Pair(getString(R.string.activity_running), R.drawable.ic_running)
+            "cycling" -> Pair(getString(R.string.activity_cycling), R.drawable.ic_cycling)
+            "walking" -> Pair(getString(R.string.activity_walking), R.drawable.ic_walking)
+            else -> Pair(getString(R.string.activity_running), R.drawable.ic_running)
+        }
+        binding.chipActivityType.text = chipText
+        binding.chipActivityType.setChipIconResource(chipIcon)
     }
 
     private fun setupStepCounter() {
@@ -204,10 +221,6 @@ class LiveTrackingActivity : AppCompatActivity(), OnMapReadyCallback, SensorEven
         binding.btnStop.setOnClickListener {
             stopTracking()
         }
-
-        binding.btnLock.setOnClickListener {
-            // Toggle screen lock functionality
-        }
     }
 
     private fun checkPermissions() {
@@ -261,10 +274,6 @@ class LiveTrackingActivity : AppCompatActivity(), OnMapReadyCallback, SensorEven
 
         viewModel.calories.observe(this) { calories ->
             binding.tvCalories.text = "$calories kcal"
-        }
-
-        viewModel.elevation.observe(this) { elevation ->
-            binding.tvElevation.text = "${elevation.toInt()} m"
         }
 
         viewModel.steps.observe(this) { steps ->
@@ -348,17 +357,14 @@ class LiveTrackingActivity : AppCompatActivity(), OnMapReadyCallback, SensorEven
             TrackingState.IDLE -> {
                 binding.btnStartPause.setImageResource(R.drawable.ic_play)
                 binding.btnStop.visibility = android.view.View.GONE
-                binding.btnLock.visibility = android.view.View.GONE
             }
             TrackingState.TRACKING -> {
                 binding.btnStartPause.setImageResource(R.drawable.ic_pause)
                 binding.btnStop.visibility = android.view.View.VISIBLE
-                binding.btnLock.visibility = android.view.View.VISIBLE
             }
             TrackingState.PAUSED -> {
                 binding.btnStartPause.setImageResource(R.drawable.ic_play)
                 binding.btnStop.visibility = android.view.View.VISIBLE
-                binding.btnLock.visibility = android.view.View.GONE
             }
             TrackingState.STOPPED -> {
                 // Navigate to summary

@@ -9,6 +9,7 @@ import com.fittrackpro.data.local.database.dao.TrackPointDao
 import com.fittrackpro.data.local.database.entity.Track
 import com.fittrackpro.data.local.database.entity.TrackPoint
 import com.fittrackpro.data.local.database.entity.TrackStatistics
+import com.fittrackpro.service.ExportService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ActivityDetailViewModel @Inject constructor(
     private val trackDao: TrackDao,
-    private val trackPointDao: TrackPointDao
+    private val trackPointDao: TrackPointDao,
+    private val exportService: ExportService
 ) : ViewModel() {
 
     private val _track = MutableLiveData<Track?>()
@@ -34,8 +36,12 @@ class ActivityDetailViewModel @Inject constructor(
     private val _deleteSuccess = MutableLiveData<Boolean>()
     val deleteSuccess: LiveData<Boolean> = _deleteSuccess
 
+    private val _exportResult = MutableLiveData<ExportService.ExportResult?>()
+    val exportResult: LiveData<ExportService.ExportResult?> = _exportResult
+
     private var currentTrackId: String? = null
     private var currentTrack: Track? = null
+    private var currentExportFormat: ExportService.ExportFormat? = null
 
     fun loadActivity(trackId: String) {
         currentTrackId = trackId
@@ -55,10 +61,6 @@ class ActivityDetailViewModel @Inject constructor(
                 _deleteSuccess.value = true
             }
         }
-    }
-
-    fun shareActivity() {
-        // Implementation for sharing activity
     }
 
     fun formatDate(timestamp: Long): String {
@@ -83,5 +85,25 @@ class ActivityDetailViewModel @Inject constructor(
         val minutes = paceMinPerKm.toInt()
         val seconds = ((paceMinPerKm - minutes) * 60).toInt()
         return String.format("%d:%02d /km", minutes, seconds)
+    }
+
+    fun exportActivity(format: ExportService.ExportFormat) {
+        currentTrackId?.let { trackId ->
+            currentExportFormat = format
+            viewModelScope.launch {
+                val result = exportService.exportTrack(trackId, format)
+                _exportResult.value = result
+            }
+        }
+    }
+
+    fun createShareIntent(): android.content.Intent? {
+        val result = _exportResult.value ?: return null
+        val format = currentExportFormat ?: return null
+        return exportService.createShareIntent(result, format)
+    }
+
+    fun clearExportResult() {
+        _exportResult.value = null
     }
 }

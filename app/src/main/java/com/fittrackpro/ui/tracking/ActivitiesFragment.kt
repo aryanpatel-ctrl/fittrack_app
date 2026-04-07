@@ -40,14 +40,41 @@ class ActivitiesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupUI()
         setupRecyclerView()
+        setupFilterChips()
+        setupSwipeRefresh()
         observeViewModel()
+    }
+
+    private fun setupUI() {
+        binding.btnCompare.setOnClickListener {
+            findNavController().navigate(R.id.action_activities_to_compare)
+        }
     }
 
     private fun setupRecyclerView() {
         binding.rvActivities.apply {
             layoutManager = LinearLayoutManager(requireContext())
             adapter = activitiesAdapter
+        }
+    }
+
+    private fun setupFilterChips() {
+        binding.chipGroupFilter.setOnCheckedStateChangeListener { _, checkedIds ->
+            val filter = when {
+                checkedIds.contains(R.id.chip_running) -> "running"
+                checkedIds.contains(R.id.chip_cycling) -> "cycling"
+                checkedIds.contains(R.id.chip_walking) -> "walking"
+                else -> null // "All" or nothing selected
+            }
+            viewModel.filterByType(filter)
+        }
+    }
+
+    private fun setupSwipeRefresh() {
+        binding.swipeRefresh.setOnRefreshListener {
+            viewModel.refresh()
         }
     }
 
@@ -66,6 +93,11 @@ class ActivitiesFragment : Fragment() {
         // Observe monthly stats
         viewModel.monthlyStats.observe(viewLifecycleOwner) { stats ->
             updateMonthlyStats(stats)
+        }
+
+        // Observe loading state for SwipeRefresh
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.swipeRefresh.isRefreshing = isLoading
         }
     }
 
