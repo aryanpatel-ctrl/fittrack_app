@@ -25,30 +25,7 @@ class SocialViewModel @Inject constructor(
     val isLoading: LiveData<Boolean> = _isLoading
 
     init {
-        loadActiveChallenges()
-    }
-
-    fun loadActiveChallenges() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val userId = userPreferences.userId
-            if (userId != null) {
-                challengeDao.getChallengesForUser(userId).collect { challenges ->
-                    _challenges.value = challenges.filter { it.status == "active" }
-                    _isLoading.value = false
-                }
-            }
-        }
-    }
-
-    fun loadDiscoverChallenges() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            challengeDao.getPublicActiveChallenges().collect { challenges ->
-                _challenges.value = challenges
-                _isLoading.value = false
-            }
-        }
+        loadMyChallenges()
     }
 
     fun loadMyChallenges() {
@@ -56,11 +33,27 @@ class SocialViewModel @Inject constructor(
             _isLoading.value = true
             val userId = userPreferences.userId
             if (userId != null) {
-                challengeDao.getChallengesByCreator(userId).collect { challenges ->
-                    _challenges.value = challenges
+                try {
+                    challengeDao.getChallengesForUser(userId).collect { challenges ->
+                        _challenges.value = challenges
+                        _isLoading.value = false
+                    }
+                } catch (e: Exception) {
+                    _challenges.value = emptyList()
                     _isLoading.value = false
                 }
+            } else {
+                _challenges.value = emptyList()
+                _isLoading.value = false
             }
+        }
+    }
+
+    fun sendInvite(email: String) {
+        viewModelScope.launch {
+            // In a real app, this would send an email invitation via backend API
+            // For now, just log the invite
+            // You could integrate with email intent or backend service here
         }
     }
 }

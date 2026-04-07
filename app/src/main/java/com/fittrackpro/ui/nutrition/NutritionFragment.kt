@@ -119,9 +119,6 @@ class NutritionFragment : Fragment() {
             append("\n  Protein: ${nutritionLog.protein.toInt()}g")
             append("\n  Carbs: ${nutritionLog.carbs.toInt()}g")
             append("\n  Fat: ${nutritionLog.fat.toInt()}g")
-            if (nutritionLog.fiber > 0) {
-                append("\n  Fiber: ${nutritionLog.fiber.toInt()}g")
-            }
         }
 
         MaterialAlertDialogBuilder(requireContext())

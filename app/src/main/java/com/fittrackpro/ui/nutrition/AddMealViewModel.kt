@@ -9,6 +9,7 @@ import com.fittrackpro.data.local.database.entity.FoodItem
 import com.fittrackpro.data.local.database.entity.NutritionLog
 import com.fittrackpro.data.local.preferences.UserPreferences
 import com.fittrackpro.data.remote.api.NutritionixApi
+import com.fittrackpro.data.remote.api.OpenFoodFactsApi
 import com.fittrackpro.data.remote.api.UsdaNutrient
 import com.fittrackpro.util.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,7 @@ import javax.inject.Inject
 class AddMealViewModel @Inject constructor(
     private val nutritionDao: NutritionDao,
     private val nutritionixApi: NutritionixApi,
+    private val openFoodFactsApi: OpenFoodFactsApi,
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
@@ -32,6 +34,12 @@ class AddMealViewModel @Inject constructor(
 
     private val _mealAdded = MutableLiveData<Boolean>()
     val mealAdded: LiveData<Boolean> = _mealAdded
+
+    private val _barcodeLoading = MutableLiveData<Boolean>()
+    val barcodeLoading: LiveData<Boolean> = _barcodeLoading
+
+    private val _barcodeError = MutableLiveData<String?>()
+    val barcodeError: LiveData<String?> = _barcodeError
 
     private var currentMealType = "breakfast"
 
@@ -77,6 +85,63 @@ class AddMealViewModel @Inject constructor(
 
     fun selectFood(food: FoodItem) {
         _selectedFood.value = food
+    }
+
+    fun lookupBarcode(barcode: String) {
+        viewModelScope.launch {
+            _barcodeLoading.value = true
+            _barcodeError.value = null
+
+            try {
+                // First check local database for cached barcode
+                val localFood = nutritionDao.getFoodItemByBarcode(barcode)
+                if (localFood != null) {
+                    _selectedFood.value = localFood
+                    _barcodeLoading.value = false
+                    return@launch
+                }
+
+                // Call Open Food Facts API
+                val response = openFoodFactsApi.getProductByBarcode(barcode)
+
+                if (response.isFound && response.product != null) {
+                    val product = response.product
+                    val nutriments = product.nutriments
+
+                    val foodItem = FoodItem(
+                        id = UUID.randomUUID().toString(),
+                        name = product.productName ?: "Unknown Product",
+                        brand = product.brands,
+                        barcode = barcode,
+                        calories = nutriments?.caloriesPer100g?.toInt() ?: 0,
+                        protein = nutriments?.proteinPer100g ?: 0f,
+                        carbs = nutriments?.carbsPer100g ?: 0f,
+                        fat = nutriments?.fatPer100g ?: 0f,
+                        fiber = nutriments?.fiberPer100g ?: 0f,
+                        sugar = nutriments?.sugarsPer100g ?: 0f,
+                        servingSize = product.servingQuantity?.toFloat() ?: 100f,
+                        servingUnit = "g",
+                        imageUrl = product.imageSmallUrl,
+                        isCustom = false
+                    )
+
+                    // Cache the food item locally
+                    nutritionDao.insertFoodItem(foodItem)
+
+                    _selectedFood.value = foodItem
+                } else {
+                    _barcodeError.value = "Product not found. Try manual entry."
+                }
+            } catch (e: Exception) {
+                _barcodeError.value = "Failed to lookup barcode: ${e.message}"
+            } finally {
+                _barcodeLoading.value = false
+            }
+        }
+    }
+
+    fun clearBarcodeError() {
+        _barcodeError.value = null
     }
 
     private fun getDateTimestamp(): Long {
