@@ -73,4 +73,26 @@ interface TrackDao {
 
     @Query("SELECT * FROM personal_records WHERE userId = :userId ORDER BY achievedAt DESC LIMIT :limit")
     suspend fun getRecentPersonalRecords(userId: String, limit: Int): List<PersonalRecord>
+
+    // Aggregated stats query for syncing
+    @Query("""
+        SELECT
+            COUNT(*) as totalActivities,
+            COALESCE(SUM(ts.distance), 0) as totalDistance,
+            COALESCE(SUM(ts.duration), 0) as totalDuration,
+            COALESCE(SUM(ts.calories), 0) as totalCalories,
+            COALESCE(SUM(ts.elevationGain), 0) as totalElevation
+        FROM tracks t
+        LEFT JOIN track_statistics ts ON t.id = ts.trackId
+        WHERE t.userId = :userId AND t.status = 'completed'
+    """)
+    suspend fun getAggregatedStats(userId: String): AggregatedStats
 }
+
+data class AggregatedStats(
+    val totalActivities: Int,
+    val totalDistance: Double,
+    val totalDuration: Long,
+    val totalCalories: Int,
+    val totalElevation: Double
+)

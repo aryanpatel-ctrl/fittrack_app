@@ -72,7 +72,10 @@ import com.fittrackpro.data.local.database.entity.*
         WeatherCache::class,
         Notification::class,
         AnalyticsCache::class,
-        PerformanceMetric::class
+        PerformanceMetric::class,
+
+        // Step tracking entities
+        DailySteps::class
     ],
     version = 1,
     exportSchema = true
@@ -109,6 +112,9 @@ abstract class FitTrackDatabase : RoomDatabase() {
 
     // Coach DAOs
     abstract fun coachDao(): CoachDao
+
+    // Step DAOs
+    abstract fun stepDao(): StepDao
 
     companion object {
         const val DATABASE_NAME = "fittrack_database"
