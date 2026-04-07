@@ -251,17 +251,4 @@
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <!-- FAB to Start New Activity -->
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/fab_new_activity"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
-        android:text="@string/start_workout"
-        android:textAllCaps="false"
-        app:backgroundTint="@color/primary"
-        app:icon="@drawable/ic_play"
-        app:iconTint="@color/white" />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

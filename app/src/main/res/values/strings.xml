@@ -177,7 +177,7 @@
     <!-- ==================== EMPTY STATES ==================== -->
     <!-- Activities Empty State -->
     <string name="empty_activities_title">Your Journey Begins Here</string>
-    <string name="empty_activities_message">No activities recorded yet. Tap the button below to start your first workout and begin tracking your progress!</string>
+    <string name="empty_activities_message">No activities recorded yet. Tap the play button to start your first workout and begin tracking your progress!</string>
     <string name="empty_activities_cta">Start First Workout</string>
 
     <!-- Training Empty State -->
@@ -671,6 +671,14 @@
     <string name="invite_friends_title">Compete with Friends</string>
     <string name="invite_friends_subtitle">Challenges are more fun with friends. Invite them to join!</string>
     <string name="invite">Invite</string>
+    <string name="invite_friend">Invite Friend</string>
+    <string name="invite_email_description">Enter your friend\'s email address to send them an invitation to join FitTrack Pro.</string>
+    <string name="send_invite">Send Invite</string>
+    <string name="invite_sent">Invitation sent to %1$s</string>
+    <string name="invalid_email">Please enter a valid email address</string>
+    <string name="my_challenges">My Challenges</string>
+    <string name="no_challenges_yet">No Challenges Yet</string>
+    <string name="create_challenge_hint">Create or join a challenge to get started!</string>
 
     <!-- Nutrition Additional -->
     <string name="calorie_breakdown">Calorie Breakdown</string>

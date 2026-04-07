@@ -71,6 +71,12 @@
         <argument
             android:name="workoutId"
             app:argType="string" />
+
+        <argument
+            android:name="scheduledWorkoutId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
     </fragment>
 
     <!-- Social / Challenges -->

@@ -7,26 +7,16 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
-    <!-- Map Container -->
-    <FrameLayout
-        android:id="@+id/map_container"
+    <!-- Map Container with Google Maps Fragment -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/map_fragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/metrics_card"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <!-- Google Map will be added here programmatically -->
-        <TextView
-            android:id="@+id/tv_map_placeholder"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Map Loading..."
-            android:textColor="@color/text_hint" />
-
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Back Button -->
     <ImageButton
@@ -164,6 +154,17 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_steps"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:drawableStart="@drawable/ic_steps"
+                    android:drawablePadding="8dp"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/text_secondary"
+                    tools:text="0 steps" />
 
                 <TextView
                     android:id="@+id/tv_calories"

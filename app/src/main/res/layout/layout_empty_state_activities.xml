@@ -55,20 +55,6 @@
         android:textColor="@color/text_secondary"
         android:textSize="15sp" />
 
-    <!-- CTA Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_empty_state_cta"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:paddingHorizontal="32dp"
-        android:text="@string/empty_activities_cta"
-        android:textAllCaps="false"
-        android:textSize="15sp"
-        app:cornerRadius="24dp"
-        app:icon="@drawable/ic_play"
-        app:iconGravity="textStart"
-        app:iconPadding="8dp" />
-
     <!-- Motivational Hint -->
     <LinearLayout
         android:layout_width="wrap_content"

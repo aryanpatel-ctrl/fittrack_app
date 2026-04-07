@@ -156,14 +156,6 @@
             android:text="Skip" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_start_workout"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:text="Start" />
-
-        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_complete_workout"
             android:layout_width="0dp"
             android:layout_height="48dp"
