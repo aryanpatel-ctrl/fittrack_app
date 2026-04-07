@@ -53,6 +53,9 @@ swiperefreshlayout = "1.1.0"
 # Image Loading
 glide = "4.16.0"
 
+# ML Kit Barcode Scanning
+mlkitBarcode = "17.2.0"
+
 # Testing
 junit = "4.13.2"
 junitVersion = "1.1.5"
@@ -125,6 +128,9 @@ androidx-swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "s
 # Glide (Image Loading)
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", version.ref = "glide" }
+
+# ML Kit Barcode Scanning
+mlkit-barcode = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkitBarcode" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

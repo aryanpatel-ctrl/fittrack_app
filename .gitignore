@@ -117,6 +117,14 @@ credentials.json
 # Kotlin
 .kotlin/
 
+# IDE markdown settings
+.idea/markdown.xml
+
+# Documentation archives and generated docs
+docs.zip
+docs/
+*.md
+
 # Coverage reports
 coverage/
 *.ec

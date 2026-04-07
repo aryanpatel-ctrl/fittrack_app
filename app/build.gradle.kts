@@ -105,6 +105,9 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
 
+    // ML Kit Barcode Scanning
+    implementation(libs.mlkit.barcode)
+
     // WorkManager (Required - Background Sync)
     implementation(libs.androidx.work.runtime.ktx)
 
